@@ -85,7 +85,7 @@ describe("signatureDraftSchema", () => {
 describe("sealedPayloadV1Schema", () => {
   const validPayload = {
     preferredName: "Alex",
-    themeId: "teal",
+    themeId: "sky-flirt",
     birthdayWish: "vacation",
     spoilModes: ["slow-mornings"],
     travelPersona: "eating-through-the-destination",

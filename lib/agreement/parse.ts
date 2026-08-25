@@ -78,6 +78,24 @@ export function parseAgreementBlocks(markdown: string): AgreementBlock[] {
   return blocks;
 }
 
+/**
+ * Splits the flat block list into pages at each h4 boundary, so a long
+ * agreement can be read "in bits" instead of one long scroll — h4 already
+ * marks each real section of this document ("The Birthday Girl agrees:",
+ * "Fine print", "Final warning", ...), so no extra markup is needed.
+ */
+export function paginateAgreementBlocks(blocks: AgreementBlock[]): AgreementBlock[][] {
+  const pages: AgreementBlock[][] = [];
+  for (const block of blocks) {
+    if (block.type === "h4" || pages.length === 0) {
+      pages.push([block]);
+    } else {
+      pages[pages.length - 1].push(block);
+    }
+  }
+  return pages;
+}
+
 /** Flattens tokens back to plain text, e.g. for snapshot tests of exact final wording. */
 export function tokensToPlainText(tokens: InlineToken[], name: string): string {
   return tokens

@@ -17,44 +17,86 @@ export function SignatureSurface({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const padRef = useRef<SignaturePadType | null>(null);
+  const lastSizeRef = useRef({ width: 0, height: 0 });
+  const isDrawingRef = useRef(false);
   const [hasStroke, setHasStroke] = useState(false);
   const [typedMode, setTypedMode] = useState(false);
   const [typedValue, setTypedValue] = useState(preferredName);
 
   useEffect(() => {
     let disposed = false;
-    let resize: (() => void) | null = null;
+    let handleResize: (() => void) | null = null;
 
     import("signature_pad").then(({ default: SignaturePad }) => {
       if (disposed || !canvasRef.current) return;
       const canvas = canvasRef.current;
       const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent-strong").trim();
 
+      /**
+       * Only touches the canvas when its rendered size genuinely changed —
+       * assigning canvas.width/height always clears the canvas, even to the
+       * same value, so a naive "resize on every window resize" handler wipes
+       * the drawing on every spurious mobile resize event (keyboard,
+       * dynamic toolbar). Never interrupts a stroke in progress either.
+       */
+      function sizeCanvas(): void {
+        const dpr = Math.min(window.devicePixelRatio || 1, 3);
+        const rect = canvas.getBoundingClientRect();
+        const nextWidth = Math.round(rect.width * dpr);
+        const nextHeight = Math.round(rect.height * dpr);
+        if (nextWidth === lastSizeRef.current.width && nextHeight === lastSizeRef.current.height) return;
+
+        const pad = padRef.current;
+        const previousData = pad?.toData() ?? [];
+        const previousWidth = lastSizeRef.current.width || nextWidth;
+        const previousHeight = lastSizeRef.current.height || nextHeight;
+        const scaleX = nextWidth / previousWidth;
+        const scaleY = nextHeight / previousHeight;
+
+        canvas.width = nextWidth;
+        canvas.height = nextHeight;
+        canvas.getContext("2d")?.scale(dpr, dpr);
+        lastSizeRef.current = { width: nextWidth, height: nextHeight };
+
+        if (pad && previousData.length > 0) {
+          pad.fromData(
+            previousData.map((group) => ({
+              ...group,
+              points: group.points.map((point) => ({ ...point, x: point.x * scaleX, y: point.y * scaleY })),
+            })),
+          );
+        }
+      }
+
       const pad = new SignaturePad(canvas, {
         minWidth: 1.4,
         maxWidth: 2.8,
         penColor: accent || "#1f4f4d",
       });
-
-      resize = () => {
-        const dpr = Math.min(window.devicePixelRatio || 1, 3);
-        const rect = canvas.getBoundingClientRect();
-        const data = pad.toData();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        canvas.getContext("2d")?.scale(dpr, dpr);
-        if (data.length > 0) pad.fromData(data);
-      };
-
-      pad.addEventListener("endStroke", () => setHasStroke(!pad.isEmpty()));
+      pad.addEventListener("beginStroke", () => {
+        isDrawingRef.current = true;
+      });
+      pad.addEventListener("endStroke", () => {
+        isDrawingRef.current = false;
+        setHasStroke(!pad.isEmpty());
+      });
       padRef.current = pad;
-      resize();
-      window.addEventListener("resize", resize);
+      sizeCanvas();
+
+      handleResize = () => {
+        if (isDrawingRef.current) return;
+        sizeCanvas();
+      };
+      window.addEventListener("resize", handleResize);
+      window.addEventListener("orientationchange", handleResize);
     });
 
     return () => {
       disposed = true;
-      if (resize) window.removeEventListener("resize", resize);
+      if (handleResize) {
+        window.removeEventListener("resize", handleResize);
+        window.removeEventListener("orientationchange", handleResize);
+      }
       padRef.current?.off();
     };
   }, []);

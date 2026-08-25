@@ -9,6 +9,16 @@ import { daysUntil, formatVacationDateRange } from "@/lib/reveal/countdown";
 import type { RevealData } from "@/lib/reveal/types";
 import type { ThemeRecord } from "@/lib/theme/themes";
 
+function SignatureBlock({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <div className="flex h-14 items-center justify-center text-accent-strong">{children}</div>
+      <div className="h-px w-28" style={{ background: "var(--hairline)" }} />
+      <p className="text-[10px] tracking-wide text-ink-muted uppercase">{label}</p>
+    </div>
+  );
+}
+
 export function InvitationCard({
   preferredName,
   theme,
@@ -25,6 +35,7 @@ export function InvitationCard({
   const [showIOSHint, setShowIOSHint] = useState(false);
   const cardUrl = `/api/invite/${token}/card`;
   const days = daysUntil(reveal.startIso);
+  const name = preferredName || "you";
 
   function handleSave(event: MouseEvent<HTMLAnchorElement>): void {
     if (isIOS()) {
@@ -35,11 +46,12 @@ export function InvitationCard({
   }
 
   return (
-    <div className="glass-surface flex flex-col items-center gap-6 px-7 py-10 text-center" style={{ boxShadow: `var(--shadow-card), 0 0 60px -10px var(--accent-glow)` }}>
+    <div className="aura-panel flex flex-col items-center gap-6 px-7 py-10 text-center">
+      <p className="font-script text-2xl text-accent-strong">Lover&rsquo;s Bid</p>
       <InvitationIcon className="h-8 w-8 text-accent-strong" />
       <p className="text-xs font-semibold tracking-wide text-accent-strong uppercase">{experienceCopy.reveal.eyebrow}</p>
       <h1 className="font-display text-[clamp(1.9rem,7vw,2.5rem)] leading-[1.05] text-ink">
-        {interpolate(experienceCopy.reveal.invitationLine, { name: preferredName || "you" })}
+        {interpolate(experienceCopy.reveal.invitationLine, { name })}
       </h1>
 
       <div className="flex flex-col items-center gap-1">
@@ -51,6 +63,31 @@ export function InvitationCard({
       </div>
 
       {reveal.note && <p className="max-w-[30ch] text-[15px] leading-relaxed text-ink italic">{reveal.note}</p>}
+
+      <div className="mt-2 flex items-start justify-center gap-10">
+        <SignatureBlock label="The Birthday Girl">
+          {reveal.signature.kind === "typed" ? (
+            <p className="font-script text-3xl text-ink">{reveal.signature.value}</p>
+          ) : (
+            <svg viewBox={reveal.signature.viewBox} className="h-14 w-32">
+              {reveal.signature.paths.map((d, index) => (
+                <path
+                  key={index}
+                  d={d}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              ))}
+            </svg>
+          )}
+        </SignatureBlock>
+        <SignatureBlock label="The Man Who Clearly Has a Plan">
+          <p className="font-script text-3xl text-ink">Isaac</p>
+        </SignatureBlock>
+      </div>
 
       <div className="mt-2 flex flex-col items-center gap-3">
         <a
@@ -67,9 +104,7 @@ export function InvitationCard({
         </button>
       </div>
 
-      {theme && (
-        <span aria-hidden="true" className="mt-2 h-2 w-2 rounded-full" style={{ background: theme.accent }} />
-      )}
+      {theme && <span aria-hidden="true" className="mt-2 h-2 w-2" style={{ background: theme.accent }} />}
     </div>
   );
 }

@@ -73,7 +73,7 @@ describe("experienceReducer", () => {
       ...createInitialState("invite-1"),
       stage: "review" as const,
       preferredName: "Alex",
-      themeId: "teal" as const,
+      themeId: "sky-flirt" as const,
       birthdayWish: "vacation" as const,
       spoilModes: ["slow-mornings" as const],
       travelPersona: "eating-through-the-destination" as const,
@@ -107,7 +107,7 @@ describe("experienceReducer", () => {
       ...createInitialState("invite-1"),
       stage: "sealing" as const,
       preferredName: "Alex",
-      themeId: "teal" as const,
+      themeId: "sky-flirt" as const,
       birthdayWish: "vacation" as const,
       spoilModes: ["slow-mornings" as const],
       travelPersona: "eating-through-the-destination" as const,
@@ -120,7 +120,7 @@ describe("experienceReducer", () => {
     expect(sealed.stage).toBe("reveal");
     expect(sealed.sealedAt).toBe(NOW);
     expect(sealed.preferredName).toBe("Alex");
-    expect(sealed.themeId).toBe("teal");
+    expect(sealed.themeId).toBe("sky-flirt");
     expect(sealed.signature).toBeNull();
     expect(sealed.mustNotMiss).toBeNull();
     expect(sealed.spoilModes).toEqual([]);

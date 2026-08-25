@@ -3,6 +3,7 @@ import { getEnv } from "@/lib/config/env";
 import { decryptPayload } from "@/lib/server/crypto";
 import { findInviteByToken } from "@/lib/server/invites";
 import { renderInvitationCard, sanitizeFilename } from "@/lib/server/renderInvitationCard";
+import { buildRevealSignature } from "@/lib/server/signatureSvg";
 import { sealedPayloadV1Schema } from "@/lib/validation/schemas";
 
 export const dynamic = "force-dynamic";
@@ -27,6 +28,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
     startIso: env.VACATION_START,
     endIso: env.VACATION_END,
     note: env.FINAL_PRIVATE_NOTE,
+    signature: buildRevealSignature(decrypted.signature),
   });
 
   const buffer = await image.arrayBuffer();

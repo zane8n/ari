@@ -8,7 +8,7 @@ describe("ThemeSwatch", () => {
   it("exposes radio semantics and reports theme + tap origin, without touching the DOM theme itself", async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
-    const theme = getTheme("aubergine");
+    const theme = getTheme("violet-hour");
     const before = document.documentElement.style.getPropertyValue("--accent");
 
     render(<ThemeSwatch theme={theme} checked={false} onSelect={onSelect} />);
@@ -16,7 +16,7 @@ describe("ThemeSwatch", () => {
 
     expect(onSelect).toHaveBeenCalledTimes(1);
     const [calledTheme, origin] = onSelect.mock.calls[0];
-    expect(calledTheme.id).toBe("aubergine");
+    expect(calledTheme.id).toBe("violet-hour");
     expect(typeof origin.x).toBe("number");
     expect(typeof origin.y).toBe("number");
 
@@ -25,8 +25,8 @@ describe("ThemeSwatch", () => {
   });
 
   it("shows the theme's display name", () => {
-    const theme = getTheme("burnished-gold");
+    const theme = getTheme("rose-gold");
     render(<ThemeSwatch theme={theme} checked={false} onSelect={() => {}} />);
-    expect(screen.getByText("Burnished Gold")).toBeInTheDocument();
+    expect(screen.getByText("Rosé Gold")).toBeInTheDocument();
   });
 });

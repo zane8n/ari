@@ -27,7 +27,7 @@ export function SignatureScene({
 
   if (state.stage === "sealing") {
     return (
-      <div className="glass-surface flex flex-col items-center gap-5 px-7 py-14 text-center">
+      <div className="aura-panel flex flex-col items-center gap-5 px-7 py-14 text-center">
         <p className="font-display text-xl text-ink">Sealing it…</p>
         {state.sealingError && (
           <>

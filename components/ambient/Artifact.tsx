@@ -2,64 +2,19 @@
 
 import { forwardRef } from "react";
 import type { ArtifactKind, ArtifactPlacement } from "@/lib/ambient/layout";
+import { CompassIcon, HeartSparkIcon, RibbonBadgeIcon, RoseIcon, SprigIcon } from "@/components/icons/Decorative";
 import { type MotionValue, m, useTransform } from "@/lib/motion/m";
 
-function PebbleShape() {
-  return (
-    <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <path
-        d="M20 3c7 0 15 4 16.5 12 1.4 7.4-4.4 13-11 16.6-6.8 3.7-15.3 3-19-3.4C2.6 21.8 4 13.7 10 8.2 13.4 5 16.2 3 20 3Z"
-        fill="var(--accent-soft)"
-        stroke="var(--accent)"
-        strokeOpacity="0.35"
-      />
-    </svg>
-  );
-}
-
-function RibbonShape() {
-  return (
-    <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <path d="M6 12 L34 8 L30 20 L36 32 L10 28 L14 20 Z" fill="var(--accent-soft)" opacity="0.9" />
-      <path d="M6 12 L20 16 L14 20 L10 28 Z" fill="var(--accent)" opacity="0.35" />
-    </svg>
-  );
-}
-
-function HaloShape() {
-  return (
-    <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <ellipse cx="20" cy="20" rx="16" ry="11" stroke="var(--accent)" strokeOpacity="0.4" strokeWidth="1.5" />
-    </svg>
-  );
-}
-
-function RouteShape() {
-  return (
-    <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <path d="M6 30 C 14 10, 26 30, 34 10" stroke="var(--accent)" strokeOpacity="0.45" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="1 6" />
-      <circle cx="6" cy="30" r="2.5" fill="var(--accent)" fillOpacity="0.5" />
-      <circle cx="34" cy="10" r="2.5" fill="var(--accent)" fillOpacity="0.5" />
-    </svg>
-  );
-}
-
-function SealShape() {
-  return (
-    <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <circle cx="20" cy="20" r="13" fill="var(--accent-soft)" stroke="var(--accent)" strokeOpacity="0.4" strokeWidth="1.5" />
-      <path d="M14 21 Q20 26 26 19" stroke="var(--accent)" strokeOpacity="0.5" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-const SHAPES: Record<ArtifactKind, () => React.JSX.Element> = {
-  pebble: PebbleShape,
-  ribbon: RibbonShape,
-  halo: HaloShape,
-  route: RouteShape,
-  seal: SealShape,
+const SHAPES: Record<ArtifactKind, (props: { className?: string }) => React.JSX.Element> = {
+  pebble: SprigIcon,
+  ribbon: RibbonBadgeIcon,
+  halo: HeartSparkIcon,
+  route: CompassIcon,
+  seal: RoseIcon,
 };
+
+/** Foliage sways rather than drifting flat — it reads more alive. */
+const SWAY_KINDS = new Set<ArtifactKind>(["pebble", "seal"]);
 
 type ArtifactProps = {
   placement: ArtifactPlacement;
@@ -86,15 +41,16 @@ export const Artifact = forwardRef<HTMLDivElement, ArtifactProps>(function Artif
         left: `${placement.leftPercent}%`,
         width: placement.sizePx,
         height: placement.sizePx,
+        color: "var(--accent)",
         x,
         y,
-        opacity: illuminated ? 1 : 0.55,
-        filter: illuminated ? "drop-shadow(0 0 10px var(--accent-glow))" : "none",
+        opacity: illuminated ? 0.95 : 0.62,
+        filter: illuminated ? "drop-shadow(0 0 12px var(--accent-glow))" : "drop-shadow(0 0 5px var(--accent-glow))",
         transition: "opacity 420ms ease-out, filter 420ms ease-out",
       }}
     >
       <div
-        className={`ambient-drift h-full w-full ${placement.kind === "halo" ? "ambient-rotate" : ""}`}
+        className={`ambient-drift h-full w-full ${SWAY_KINDS.has(placement.kind) ? "ambient-sway" : ""}`}
         style={
           {
             "--drift-duration": `${placement.driftSeconds}s`,
@@ -104,7 +60,7 @@ export const Artifact = forwardRef<HTMLDivElement, ArtifactProps>(function Artif
           } as React.CSSProperties
         }
       >
-        <Shape />
+        <Shape className="h-full w-full" />
       </div>
     </m.div>
   );

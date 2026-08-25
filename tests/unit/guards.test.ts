@@ -23,7 +23,7 @@ describe("canSubmitName", () => {
 
 describe("canConfirmTheme", () => {
   it("accepts a known theme id and rejects everything else", () => {
-    expect(canConfirmTheme("teal")).toBe(true);
+    expect(canConfirmTheme("sky-flirt")).toBe(true);
     expect(canConfirmTheme("hot-pink")).toBe(false);
     expect(canConfirmTheme(null)).toBe(false);
   });
@@ -60,7 +60,7 @@ describe("canReachAgreement", () => {
     const state = {
       ...createInitialState("i1"),
       preferredName: "Alex",
-      themeId: "teal" as const,
+      themeId: "sky-flirt" as const,
       birthdayWish: "vacation" as const,
       spoilModes: ["slow-mornings" as const],
       travelPersona: "eating-through-the-destination" as const,

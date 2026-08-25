@@ -2,15 +2,13 @@ import { describe, expect, it } from "vitest";
 import { actionForegroundContrast, MIN_ACTION_CONTRAST, THEME_IDS, THEME_LIST } from "@/lib/theme/themes";
 
 describe("theme registry", () => {
-  it("has exactly 14 themes with unique ids", () => {
-    expect(THEME_IDS.length).toBe(14);
-    expect(new Set(THEME_IDS).size).toBe(14);
+  it("has exactly 12 themes with unique ids", () => {
+    expect(THEME_IDS.length).toBe(12);
+    expect(new Set(THEME_IDS).size).toBe(12);
   });
 
-  it("contains no pink hue", () => {
-    for (const theme of THEME_LIST) {
-      expect(theme.displayName.toLowerCase()).not.toContain("pink");
-    }
+  it("includes the cheeky Not Pink option", () => {
+    expect(THEME_LIST.some((theme) => theme.id === "not-pink")).toBe(true);
   });
 
   it("every theme's action foreground meets WCAG AA contrast against accent-strong", () => {

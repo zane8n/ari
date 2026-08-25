@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { experienceCopy } from "@/content/experience-copy";
 import { InvitationCard } from "@/components/invitation/InvitationCard";
 import { LoverAgreement } from "@/components/agreement/LoverAgreement";
 import { getTheme } from "@/lib/theme/themes";
@@ -21,8 +22,8 @@ export function RevealScene({
 
   if (!reveal) {
     return (
-      <div className="glass-surface flex flex-col items-center gap-4 px-7 py-14 text-center">
-        <p className="font-display text-xl text-ink">Application suspiciously approved.</p>
+      <div className="aura-panel flex flex-col items-center gap-4 px-7 py-14 text-center">
+        <p className="font-display text-xl text-ink">{experienceCopy.reveal.eyebrow}</p>
         <p className="text-sm text-ink-muted">Loading your invitation…</p>
       </div>
     );

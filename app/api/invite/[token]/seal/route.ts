@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getEnv } from "@/lib/config/env";
 import { sealInvite } from "@/lib/server/invites";
 import { isTrustedPost } from "@/lib/server/requestGuards";
+import { buildRevealSignature } from "@/lib/server/signatureSvg";
 import type { RevealData } from "@/lib/reveal/types";
 import { MAX_SEAL_BODY_BYTES, sealSubmissionSchema } from "@/lib/validation/schemas";
 
@@ -53,6 +54,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
     startIso: env.VACATION_START,
     endIso: env.VACATION_END,
     note: env.FINAL_PRIVATE_NOTE,
+    signature: buildRevealSignature(parsed.data.payload.signature),
   };
 
   return NextResponse.json({ sealedAt: outcome.sealedAt, reveal });

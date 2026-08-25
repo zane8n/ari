@@ -48,7 +48,7 @@ export default async function HostPage() {
           decrypted?.signature.kind === "drawn" ? buildSignaturePaths(decrypted.signature.points) : null;
 
         return (
-          <section key={invite.id} className="glass-surface-solid flex flex-col gap-3 px-6 py-6">
+          <section key={invite.id} className="aura-panel-solid flex flex-col gap-3 px-6 py-6">
             <div className="flex items-center justify-between">
               <p className="text-xs tracking-wide text-ink-muted uppercase">{invite.publicId}</p>
               <span

@@ -123,7 +123,7 @@ export function ReviewScene({
   ];
 
   return (
-    <div className="glass-surface flex flex-col gap-5 px-6 py-9">
+    <div className="flex flex-col gap-5 px-4">
       <div>
         <p className="text-xs tracking-wide text-accent-strong uppercase">{experienceCopy.review.heading}</p>
         <h1 className="mt-1 font-display text-[clamp(1.7rem,6vw,2.1rem)] leading-[1.05] text-ink">

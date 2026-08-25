@@ -1,20 +1,18 @@
 import { contrastRatio, mix, pickContrastSafeForeground, rgbToRgba, hexToRgb } from "./color";
 
 export const THEME_IDS = [
-  "emerald",
-  "sage",
-  "forest",
-  "teal",
-  "petrol",
-  "cobalt",
-  "midnight",
-  "burgundy",
-  "aubergine",
-  "espresso",
-  "onyx",
-  "champagne",
-  "burnished-gold",
-  "slate",
+  "not-pink",
+  "poppy-kiss",
+  "peach-bellini",
+  "golden-hour",
+  "champagne-fizz",
+  "mint-crush",
+  "lagoon-kiss",
+  "sky-flirt",
+  "lilac-dream",
+  "violet-hour",
+  "plum-fizz",
+  "rose-gold",
 ] as const;
 
 export type ThemeId = (typeof THEME_IDS)[number];
@@ -34,10 +32,11 @@ export type ThemeRecord = {
   actionForeground: string;
 };
 
-export const CANVAS = "#F8F4EC";
-export const INK = "#27231F";
-const IVORY_FOREGROUND = "#F8F4EC";
-const INK_FOREGROUND = "#27231F";
+/** Moonlit-petal white and deep romantic plum — the mystical base every theme sits on. */
+export const CANVAS = "#FBF2F8";
+export const INK = "#2B1830";
+const IVORY_FOREGROUND = "#FBF2F8";
+const INK_FOREGROUND = "#2B1830";
 
 /** Minimum WCAG AA contrast for normal-weight action label text. */
 export const MIN_ACTION_CONTRAST = 4.5;
@@ -45,34 +44,32 @@ export const MIN_ACTION_CONTRAST = 4.5;
 type ThemeSeed = { id: ThemeId; displayName: string; accent: string; character: string };
 
 const THEME_SEEDS: readonly ThemeSeed[] = [
-  { id: "emerald", displayName: "Emerald", accent: "#2F7D66", character: "Rich green with calm clarity" },
-  { id: "sage", displayName: "Sage", accent: "#7E9C76", character: "Soft botanical, quiet and airy" },
-  { id: "forest", displayName: "Forest", accent: "#355E4A", character: "Deep grounded green" },
-  { id: "teal", displayName: "Teal", accent: "#2E7C78", character: "Balanced blue-green, refined" },
-  { id: "petrol", displayName: "Petrol Blue", accent: "#2D6673", character: "Moody, expensive blue-green" },
-  { id: "cobalt", displayName: "Cobalt", accent: "#4169A1", character: "Clean vivid blue, deliberately softened" },
-  { id: "midnight", displayName: "Midnight Blue", accent: "#2E3B59", character: "Dark, calm and cinematic" },
-  { id: "burgundy", displayName: "Burgundy", accent: "#7A3E4D", character: "Warm wine red without drifting pink" },
-  { id: "aubergine", displayName: "Aubergine", accent: "#5B405F", character: "Muted purple-black, intimate" },
-  { id: "espresso", displayName: "Espresso", accent: "#5A463A", character: "Warm brown with grounded luxury" },
-  { id: "onyx", displayName: "Onyx", accent: "#3C4147", character: "Soft black-charcoal, never absolute black" },
-  { id: "champagne", displayName: "Champagne", accent: "#B99B6B", character: "Pale warm metallic impression" },
-  { id: "burnished-gold", displayName: "Burnished Gold", accent: "#A98447", character: "Muted gold with depth" },
-  { id: "slate", displayName: "Slate", accent: "#667381", character: "Cool neutral blue-grey" },
+  { id: "not-pink", displayName: "Not Pink", accent: "#FF6FA0", character: "The pink that swears it isn't" },
+  { id: "poppy-kiss", displayName: "Poppy Kiss", accent: "#FF5C5C", character: "Bright, bold, a little dangerous" },
+  { id: "peach-bellini", displayName: "Peach Bellini", accent: "#FFA368", character: "Warm, giggly, golden-hour peach" },
+  { id: "golden-hour", displayName: "Golden Hour", accent: "#FFC94D", character: "Sun-warmed and glowing" },
+  { id: "champagne-fizz", displayName: "Champagne Fizz", accent: "#F0DD6E", character: "Bubbly and celebratory" },
+  { id: "mint-crush", displayName: "Mint Crush", accent: "#4FE0B0", character: "Fresh, sparkling, a little cheeky" },
+  { id: "lagoon-kiss", displayName: "Lagoon Kiss", accent: "#3DD1E0", character: "Clear water, secret cove" },
+  { id: "sky-flirt", displayName: "Sky Flirt", accent: "#5CB4FF", character: "Daydreamy periwinkle blue" },
+  { id: "lilac-dream", displayName: "Lilac Dream", accent: "#B48CFF", character: "Soft, floaty, a little magical" },
+  { id: "violet-hour", displayName: "Violet Hour", accent: "#9C5CFF", character: "Twilight, deeper and dreamier" },
+  { id: "plum-fizz", displayName: "Plum Fizz", accent: "#E056D9", character: "Bold fuchsia, no apologies" },
+  { id: "rose-gold", displayName: "Rosé Gold", accent: "#FFB4A0", character: "Warm, luminous, endlessly flattering" },
 ];
 
 /**
- * Starts at 82% accent / 18% ink (the documented token contract) and, only
- * for lighter accents where that isn't dark enough, progressively mixes in
- * more ink until accent-strong actually clears WCAG AA against ivory text —
- * "pick whichever foreground contrasts better" isn't good enough on its own
- * because both candidates can still fail against a mid-luminance accent.
+ * Starts at 82% accent / 18% ink (a gentle darken) and, only for the
+ * lightest accents where that isn't enough, mixes in progressively more ink
+ * until accent-strong actually clears WCAG AA against light text — these
+ * are bright, LIGHT colors by design, so this floor stays high to keep them
+ * reading vivid rather than muddy.
  */
 function darkenUntilAccessible(accent: string): string {
   let accentMixPercent = 82;
   let accentStrong = mix(accent, INK, accentMixPercent);
 
-  while (contrastRatio(accentStrong, IVORY_FOREGROUND) < MIN_ACTION_CONTRAST && accentMixPercent > 45) {
+  while (contrastRatio(accentStrong, IVORY_FOREGROUND) < MIN_ACTION_CONTRAST && accentMixPercent > 35) {
     accentMixPercent -= 4;
     accentStrong = mix(accent, INK, accentMixPercent);
   }
@@ -82,9 +79,9 @@ function darkenUntilAccessible(accent: string): string {
 
 function buildTheme(seed: ThemeSeed): ThemeRecord {
   const accentStrong = darkenUntilAccessible(seed.accent);
-  const accentSoft = mix(seed.accent, CANVAS, 14);
-  const accentMist = mix(seed.accent, CANVAS, 7);
-  const accentGlow = rgbToRgba(hexToRgb(seed.accent), 0.24);
+  const accentSoft = mix(seed.accent, CANVAS, 22);
+  const accentMist = mix(seed.accent, CANVAS, 10);
+  const accentGlow = rgbToRgba(hexToRgb(seed.accent), 0.32);
   const actionForeground = pickContrastSafeForeground(accentStrong, [IVORY_FOREGROUND, INK_FOREGROUND]);
 
   return {

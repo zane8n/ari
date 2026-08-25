@@ -3,20 +3,25 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
 import { formatVacationDateRange } from "@/lib/reveal/countdown";
+import type { RevealSignature } from "@/lib/reveal/types";
 import { THEMES, type ThemeId } from "@/lib/theme/themes";
 
 const WIDTH = 1080;
 const HEIGHT = 1350;
+const CANVAS = "#FBF2F8";
+const INK = "#2B1830";
+const INK_MUTED = "#7A6482";
 
 async function loadFonts() {
   const dir = path.join(process.cwd(), "assets", "fonts");
-  const [frauncesBold, frauncesItalic, manropeMedium, manropeExtraBold] = await Promise.all([
-    readFile(path.join(dir, "Fraunces-Bold.woff")),
-    readFile(path.join(dir, "Fraunces-Italic.woff")),
-    readFile(path.join(dir, "Manrope-Medium.woff")),
-    readFile(path.join(dir, "Manrope-ExtraBold.woff")),
+  const [displayBold, displayItalic, script, bodyMedium, bodyBold] = await Promise.all([
+    readFile(path.join(dir, "CormorantGaramond-Bold.woff")),
+    readFile(path.join(dir, "CormorantGaramond-Italic.woff")),
+    readFile(path.join(dir, "Parisienne-Regular.woff")),
+    readFile(path.join(dir, "Quicksand-Medium.woff")),
+    readFile(path.join(dir, "Quicksand-Bold.woff")),
   ]);
-  return { frauncesBold, frauncesItalic, manropeMedium, manropeExtraBold };
+  return { displayBold, displayItalic, script, bodyMedium, bodyBold };
 }
 
 export function sanitizeFilename(name: string): string {
@@ -30,6 +35,10 @@ export function sanitizeFilename(name: string): string {
   );
 }
 
+function signatureLine(signature: RevealSignature): string {
+  return signature.kind === "typed" ? signature.value : "her signature";
+}
+
 export async function renderInvitationCard(params: {
   preferredName: string;
   themeId: ThemeId;
@@ -37,8 +46,9 @@ export async function renderInvitationCard(params: {
   startIso: string;
   endIso: string;
   note: string;
+  signature: RevealSignature;
 }): Promise<ImageResponse> {
-  const theme = THEMES[params.themeId] ?? THEMES.teal;
+  const theme = THEMES[params.themeId] ?? THEMES["sky-flirt"];
   const fonts = await loadFonts();
 
   return new ImageResponse(
@@ -51,56 +61,65 @@ export async function renderInvitationCard(params: {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "88px 72px",
-          backgroundColor: "#F8F4EC",
-          color: "#27231F",
-          fontFamily: "Manrope",
+          backgroundColor: CANVAS,
+          color: INK,
+          fontFamily: "Body-Medium",
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
-          <div style={{ width: 56, height: 56, borderRadius: 999, border: `2px solid ${theme.accent}`, display: "flex" }} />
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          <div style={{ display: "flex", fontSize: 34, color: theme.tokens.accentStrong, fontFamily: "Script" }}>
+            Lover&rsquo;s Bid
+          </div>
           <div
             style={{
               display: "flex",
-              fontSize: 26,
+              fontSize: 24,
               letterSpacing: 4,
               color: theme.tokens.accentStrong,
               textTransform: "uppercase",
-              fontFamily: "Manrope-ExtraBold",
+              fontFamily: "Body-Bold",
             }}
           >
-            Application suspiciously approved
+            Application... shockingly... approved
           </div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-          <div style={{ display: "flex", fontSize: 58, lineHeight: 1.15, fontFamily: "Fraunces-Bold", color: "#27231F" }}>
+          <div style={{ display: "flex", fontSize: 56, lineHeight: 1.15, fontFamily: "Display-Bold", color: INK }}>
             {params.preferredName}, this is really happening.
           </div>
-          <div style={{ display: "flex", fontSize: 72, fontFamily: "Fraunces-Bold", color: theme.tokens.accentStrong }}>
+          <div style={{ display: "flex", fontSize: 70, fontFamily: "Display-Bold", color: theme.tokens.accentStrong }}>
             {params.destination}
           </div>
-          <div style={{ display: "flex", fontSize: 32, fontFamily: "Manrope-Medium", color: "#6E6861" }}>
+          <div style={{ display: "flex", fontSize: 30, fontFamily: "Body-Medium", color: INK_MUTED }}>
             {formatVacationDateRange(params.startIso, params.endIso)}
           </div>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "36px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
           {params.note && (
-            <div style={{ display: "flex", fontSize: 30, fontFamily: "Fraunces-Italic", color: "#27231F", maxWidth: 820 }}>
+            <div style={{ display: "flex", fontSize: 30, fontFamily: "Display-Italic", color: INK, maxWidth: 820 }}>
               {params.note}
             </div>
           )}
-          <div
-            style={{
-              display: "flex",
-              fontSize: 20,
-              letterSpacing: 3,
-              color: "#6E6861",
-              textTransform: "uppercase",
-              fontFamily: "Manrope-ExtraBold",
-            }}
-          >
-            A Small Matter of Your Birthday
+
+          <div style={{ display: "flex", gap: "72px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <div style={{ display: "flex", fontSize: 30, fontFamily: "Script", color: INK }}>
+                {signatureLine(params.signature)}
+              </div>
+              <div style={{ display: "flex", width: 180, height: 1, backgroundColor: "#2B183033" }} />
+              <div style={{ display: "flex", fontSize: 15, letterSpacing: 2, color: INK_MUTED, textTransform: "uppercase" }}>
+                The Birthday Girl
+              </div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <div style={{ display: "flex", fontSize: 30, fontFamily: "Script", color: INK }}>Isaac</div>
+              <div style={{ display: "flex", width: 180, height: 1, backgroundColor: "#2B183033" }} />
+              <div style={{ display: "flex", fontSize: 15, letterSpacing: 2, color: INK_MUTED, textTransform: "uppercase" }}>
+                The Man Who Clearly Has a Plan
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -109,10 +128,11 @@ export async function renderInvitationCard(params: {
       width: WIDTH,
       height: HEIGHT,
       fonts: [
-        { name: "Fraunces-Bold", data: fonts.frauncesBold, weight: 700, style: "normal" },
-        { name: "Fraunces-Italic", data: fonts.frauncesItalic, weight: 500, style: "italic" },
-        { name: "Manrope-Medium", data: fonts.manropeMedium, weight: 500, style: "normal" },
-        { name: "Manrope-ExtraBold", data: fonts.manropeExtraBold, weight: 800, style: "normal" },
+        { name: "Display-Bold", data: fonts.displayBold, weight: 700, style: "normal" },
+        { name: "Display-Italic", data: fonts.displayItalic, weight: 500, style: "italic" },
+        { name: "Script", data: fonts.script, weight: 400, style: "normal" },
+        { name: "Body-Medium", data: fonts.bodyMedium, weight: 500, style: "normal" },
+        { name: "Body-Bold", data: fonts.bodyBold, weight: 700, style: "normal" },
       ],
     },
   );

@@ -30,7 +30,7 @@ export function HostLoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="glass-surface flex w-full max-w-sm flex-col gap-4 px-7 py-9">
+    <form onSubmit={handleSubmit} className="aura-panel flex w-full max-w-sm flex-col gap-4 px-7 py-9">
       <h1 className="font-display text-xl text-ink">Host access</h1>
       <input
         type="password"

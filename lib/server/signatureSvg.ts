@@ -1,5 +1,7 @@
 import "server-only";
 import type { SignaturePointGroup } from "@/lib/experience/types";
+import type { RevealSignature } from "@/lib/reveal/types";
+import type { SealedPayloadV1 } from "@/lib/validation/schemas";
 
 const VIEW_WIDTH = 320;
 const VIEW_HEIGHT = 130;
@@ -32,4 +34,10 @@ export function buildSignaturePaths(groups: SignaturePointGroup[]): { viewBox: s
     });
 
   return { viewBox: `0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`, paths };
+}
+
+/** Converts the sealed payload's signature into the shape the reveal is allowed to receive. */
+export function buildRevealSignature(signature: SealedPayloadV1["signature"]): RevealSignature {
+  if (signature.kind === "typed") return { kind: "typed", value: signature.value };
+  return { kind: "drawn", ...buildSignaturePaths(signature.points) };
 }

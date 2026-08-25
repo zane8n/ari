@@ -6,7 +6,8 @@ import { experienceCopy } from "@/content/experience-copy";
 import { wishJokeResponses } from "@/content/response-copy";
 import { GlassAction } from "@/components/controls/GlassAction";
 import { CoinIcon, LetterIcon, MoonIcon, SuitcaseIcon } from "@/components/icons/SceneIcons";
-import { useReducedMotion } from "@/lib/motion/m";
+import { SparkleIcon } from "@/components/icons/Decorative";
+import { AnimatePresence, animate, m, useReducedMotion } from "@/lib/motion/m";
 import type { ExperienceAction, ExperienceState } from "@/lib/experience/types";
 import type { WishOptionId } from "@/lib/experience/ids";
 
@@ -20,41 +21,44 @@ export function WishScene({
   dispatch: Dispatch<ExperienceAction>;
 }) {
   const reducedMotion = useReducedMotion();
-  const cardRef = useRef<HTMLDivElement>(null);
   const moneyRef = useRef<HTMLButtonElement>(null);
   const [moneyAttempts, setMoneyAttempts] = useState(0);
-  const [moneyOffset, setMoneyOffset] = useState({ x: 0, y: 0, rotate: 0 });
+  const [moneySettledVisual, setMoneySettledVisual] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   const moneySettled = moneyAttempts >= MAX_MONEY_ATTEMPTS;
 
-  function skipEvasion(): boolean {
-    return reducedMotion || window.innerWidth < 350;
+  function playWobble(): void {
+    if (!moneyRef.current || reducedMotion) return;
+    void animate(
+      moneyRef.current,
+      { rotate: [0, -11, 9, -7, 5, -2, 0], y: [0, -5, 0, -3, 0] },
+      { duration: 0.5, ease: "easeInOut" },
+    );
+  }
+
+  function playFlop(): void {
+    if (!moneyRef.current || reducedMotion) return;
+    void animate(
+      moneyRef.current,
+      { rotate: [0, -14, 10, -3, 0], scale: [1, 0.92, 1.03, 1] },
+      { duration: 0.6, ease: "easeInOut" },
+    );
   }
 
   function resolveMoney(isKeyboard: boolean): void {
     if (moneySettled) return;
     const next = moneyAttempts + 1;
+    setMoneyAttempts(next);
 
-    if (isKeyboard || skipEvasion() || next >= MAX_MONEY_ATTEMPTS) {
-      setMoneyAttempts(MAX_MONEY_ATTEMPTS);
-      setMoneyOffset((prev) => ({ ...prev, rotate: 1.5 }));
+    if (isKeyboard || next >= MAX_MONEY_ATTEMPTS) {
+      setMoneySettledVisual(true);
+      playFlop();
       setMessage(wishJokeResponses.money);
       return;
     }
 
-    setMoneyAttempts(next);
-    const cardBounds = cardRef.current?.getBoundingClientRect();
-    const tileBounds = moneyRef.current?.getBoundingClientRect();
-    const maxX = cardBounds && tileBounds ? Math.max(16, (cardBounds.width - tileBounds.width) / 2 - 8) : 56;
-    const maxY = cardBounds && tileBounds ? Math.max(12, (cardBounds.height - tileBounds.height) / 2 - 8) : 24;
-    const magnitude = 56 + Math.random() * 32;
-    const angle = Math.random() * Math.PI * 2;
-    setMoneyOffset({
-      x: Math.max(-maxX, Math.min(maxX, Math.cos(angle) * magnitude)),
-      y: Math.max(-maxY, Math.min(maxY, Math.sin(angle) * magnitude * 0.4)),
-      rotate: 0,
-    });
+    playWobble();
   }
 
   function handleMoneyClick(event: MouseEvent<HTMLButtonElement>): void {
@@ -66,8 +70,8 @@ export function WishScene({
   }
 
   return (
-    <div ref={cardRef} className="glass-surface flex flex-col gap-6 px-6 py-9">
-      <h1 className="font-display text-[clamp(1.9rem,7vw,2.3rem)] leading-[1.05] text-ink">
+    <div className="flex flex-col gap-6 px-4">
+      <h1 className="font-display text-[clamp(1.9rem,7vw,2.4rem)] leading-[1.05] text-ink">
         {experienceCopy.wish.question}
       </h1>
 
@@ -79,12 +83,7 @@ export function WishScene({
           disabled={moneySettled}
           aria-disabled={moneySettled}
           className="choice-tile focus-ring relative flex items-center gap-3 px-4 py-3 text-left"
-          style={{
-            transform: `translate(${moneyOffset.x}px, ${moneyOffset.y}px) rotate(${moneyOffset.rotate}deg)`,
-            transition: "transform 260ms cubic-bezier(.22,1,.36,1)",
-            opacity: moneySettled ? 0.6 : 1,
-            zIndex: moneyOffset.x !== 0 || moneyOffset.y !== 0 ? 10 : undefined,
-          }}
+          style={{ opacity: moneySettledVisual ? 0.55 : 1 }}
         >
           <CoinIcon className="h-7 w-7 shrink-0 text-accent-strong" />
           <span className="text-[15.5px] font-semibold text-ink">{experienceCopy.wish.options.money}</span>
@@ -118,18 +117,33 @@ export function WishScene({
         </button>
       </div>
 
-      <p aria-live="polite" className="min-h-[1.5rem] text-sm text-ink-muted">
-        {message}
-      </p>
+      <div aria-live="polite" className="min-h-[3.5rem]">
+        <AnimatePresence mode="wait">
+          {message && (
+            <m.div
+              key={message}
+              initial={{ opacity: 0, y: 12, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 320, damping: 20 }}
+              className="flex items-start gap-2 border-l-2 py-1 pl-3"
+              style={{ borderColor: "var(--accent)" }}
+            >
+              <SparkleIcon className="mt-1 h-4 w-4 shrink-0 text-accent-strong" />
+              <p className="font-display text-lg leading-snug text-ink italic">{message}</p>
+            </m.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       <AlertDialog.Root open={state.stage === "wishConfirm"}>
         <AlertDialog.Portal>
           <AlertDialog.Overlay
             className="fixed inset-0 z-50"
-            style={{ background: "color-mix(in oklab, var(--accent-strong) 30%, transparent)" }}
+            style={{ background: "color-mix(in oklab, var(--accent-strong) 38%, transparent)" }}
           />
-          <AlertDialog.Content className="glass-surface fixed inset-x-4 bottom-4 z-50 px-6 py-7 sm:inset-x-auto sm:left-1/2 sm:top-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2">
-            <AlertDialog.Title className="font-display text-2xl text-ink">
+          <AlertDialog.Content className="aura-panel-solid fixed inset-x-4 bottom-4 z-50 px-7 py-8 sm:inset-x-auto sm:top-1/2 sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2">
+            <AlertDialog.Title className="font-display text-[1.9rem] leading-tight text-ink">
               {experienceCopy.wishConfirm.title}
             </AlertDialog.Title>
             <AlertDialog.Description className="mt-3 text-base text-ink-muted">

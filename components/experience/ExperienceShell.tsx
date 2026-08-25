@@ -14,6 +14,7 @@ import { getTheme, type ThemeRecord } from "@/lib/theme/themes";
 import type { RevealData } from "@/lib/reveal/types";
 import { sealedPayloadV1Schema } from "@/lib/validation/schemas";
 import { SceneFrame } from "./SceneFrame";
+import { TrailProgress } from "./TrailProgress";
 import { ArrivalScene } from "./scenes/ArrivalScene";
 import { NameScene } from "./scenes/NameScene";
 import { ThemeScene } from "./scenes/ThemeScene";
@@ -153,6 +154,7 @@ export function ExperienceShell({
         <PointerMotionProvider>
           <AmbientWorld state={state} />
           <ColorWash request={washRequest} reducedMotion={!!reducedMotion} />
+          <TrailProgress state={state} />
           <AnimatePresence mode="wait" initial={false}>
             <SceneFrame key={sceneKey} stage={sceneKey} wide={state.stage === "agreement"}>
               {sceneKey === "arrival" && <ArrivalScene dispatch={dispatch} />}

@@ -4,6 +4,8 @@ import { useState, type Dispatch } from "react";
 import { experienceCopy } from "@/content/experience-copy";
 import { GlassAction } from "@/components/controls/GlassAction";
 import { canSubmitMustNotMiss } from "@/lib/experience/guards";
+import { m } from "@/lib/motion/m";
+import { motionTokens } from "@/lib/motion/tokens";
 import type { ExperienceAction, ExperienceState, MustNotMiss } from "@/lib/experience/types";
 
 export function MustNotMissScene({
@@ -30,8 +32,13 @@ export function MustNotMissScene({
   }
 
   return (
-    <div className="glass-surface flex flex-col gap-5 px-6 py-9">
-      <h1 className="font-display text-[clamp(1.9rem,7vw,2.3rem)] leading-[1.05] text-ink">
+    <m.div
+      className="flex flex-col gap-5 px-4"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: motionTokens.component.ease }}
+    >
+      <h1 className="font-display text-[clamp(1.9rem,7vw,2.4rem)] leading-[1.05] text-ink">
         {experienceCopy.mustNotMiss.prompt}
       </h1>
       <p className="text-sm text-ink-muted">{experienceCopy.mustNotMiss.helper}</p>
@@ -43,7 +50,7 @@ export function MustNotMissScene({
         rows={4}
         maxLength={280}
         aria-label={experienceCopy.mustNotMiss.prompt}
-        className="focus-ring glass-surface-solid min-h-[120px] w-full resize-none px-4 py-3 text-base text-ink outline-none disabled:opacity-50"
+        className="aura-panel-solid focus-ring min-h-[120px] w-full resize-none px-4 py-3 text-base text-ink outline-none disabled:opacity-50"
       />
       {text.length > 220 && <p className="text-right text-xs text-ink-muted">{text.length}/280</p>}
 
@@ -64,8 +71,8 @@ export function MustNotMissScene({
         onClick={() => dispatch({ type: "mustNotMissSubmitted", value })}
         className="self-end"
       >
-        Continue
+        {experienceCopy.mustNotMiss.continueAction}
       </GlassAction>
-    </div>
+    </m.div>
   );
 }
