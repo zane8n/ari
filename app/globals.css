@@ -1,0 +1,238 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-manrope);
+  --color-canvas: var(--canvas);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-mist: var(--accent-mist);
+}
+
+:root {
+  --canvas: #f8f4ec;
+  --ink: #27231f;
+  --ink-muted: #6e6861;
+  --glass: rgb(255 252 247 / 0.66);
+  --hairline: rgb(39 35 31 / 0.1);
+
+  /* Default (pre-selection) accent — Teal. Overwritten inline once a theme is chosen. */
+  --accent: #2e7c78;
+  --accent-strong: #1f4f4d;
+  --accent-strong: color-mix(in oklch, var(--accent) 82%, #27231f);
+  --accent-soft: #dde9e7;
+  --accent-soft: color-mix(in oklch, var(--accent) 14%, var(--canvas));
+  --accent-mist: #eef4f3;
+  --accent-mist: color-mix(in oklch, var(--accent) 7%, var(--canvas));
+  --accent-glow: rgb(46 124 120 / 0.24);
+  --accent-glow: color-mix(in oklch, var(--accent) 24%, transparent);
+  --accent-foreground: #f8f4ec;
+
+  --radius-card: 28px;
+  --radius-choice: 22px;
+  --radius-control: 18px;
+
+  --shadow-card: 0 20px 44px -16px rgb(39 35 31 / 0.08), 0 10px 22px -10px var(--accent-glow);
+
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+
+  color-scheme: light;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+/* Static, generated-locally grain — a data texture, never a network asset. */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.013;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+}
+
+.glass-surface {
+  background: var(--glass);
+  backdrop-filter: blur(18px) saturate(115%);
+  -webkit-backdrop-filter: blur(18px) saturate(115%);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card), inset 0 1px 0 rgb(255 255 255 / 0.5);
+}
+
+.glass-surface-solid {
+  background: color-mix(in oklab, var(--glass) 92%, var(--canvas));
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.action-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 52px;
+  padding-inline: 1.5rem;
+  border-radius: 18px;
+  background: var(--accent-strong);
+  color: var(--accent-foreground);
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22);
+  transition: filter 130ms ease-out;
+}
+
+.action-primary:active {
+  filter: brightness(0.96);
+}
+
+.action-primary:disabled {
+  opacity: 0.52;
+}
+
+.action-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 52px;
+  padding-inline: 1.5rem;
+  border-radius: 18px;
+  background: transparent;
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 130ms ease-out;
+}
+
+.action-secondary:active {
+  background: var(--accent-mist);
+}
+
+/* Scene headings receive programmatic focus purely to move the screen-reader
+   cursor (section 6.1) — sighted users already see the new scene appear, so
+   suppress the default focus rectangle here specifically. */
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--canvas);
+  border-radius: inherit;
+}
+
+.choice-tile {
+  border-radius: var(--radius-choice);
+  border: 1px solid var(--hairline);
+  background: color-mix(in oklab, var(--canvas) 88%, white 12%);
+  min-height: 68px;
+  transition: background-color 180ms ease-out, border-color 180ms ease-out;
+}
+
+.choice-tile[data-selected="true"] {
+  background: var(--accent-soft);
+  border-color: color-mix(in oklab, var(--accent) 55%, var(--hairline));
+}
+
+.choice-tile:focus-within {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--canvas);
+}
+
+.name-input {
+  transition: border-color 200ms ease-out;
+}
+
+.name-input:focus {
+  border-color: var(--accent);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes ambient-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(var(--drift-x, 8px), var(--drift-y, 8px));
+  }
+}
+
+@keyframes ambient-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ripple-out {
+  from {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.ambient-drift {
+  animation: ambient-drift var(--drift-duration, 18s) ease-in-out infinite;
+  animation-delay: var(--drift-delay, 0s);
+}
+
+.ambient-rotate {
+  animation: ambient-rotate 220s linear infinite;
+}
+
+.ambient-paused .ambient-drift,
+.ambient-paused .ambient-rotate {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

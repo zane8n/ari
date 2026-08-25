@@ -1,0 +1,35 @@
+import "server-only";
+import type { SignaturePointGroup } from "@/lib/experience/types";
+
+const VIEW_WIDTH = 320;
+const VIEW_HEIGHT = 130;
+const MARGIN = 10;
+
+/** Server-side reconstruction so the host view never ships raw signature point JSON to the client. */
+export function buildSignaturePaths(groups: SignaturePointGroup[]): { viewBox: string; paths: string[] } {
+  const allPoints = groups.flat();
+  if (allPoints.length === 0) return { viewBox: `0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`, paths: [] };
+
+  const xs = allPoints.map((p) => p.x);
+  const ys = allPoints.map((p) => p.y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  const spanX = Math.max(maxX - minX, 1);
+  const spanY = Math.max(maxY - minY, 1);
+  const scale = Math.min((VIEW_WIDTH - MARGIN * 2) / spanX, (VIEW_HEIGHT - MARGIN * 2) / spanY);
+
+  const paths = groups
+    .filter((group) => group.length > 1)
+    .map((group) => {
+      const commands = group.map((point, index) => {
+        const x = MARGIN + (point.x - minX) * scale;
+        const y = MARGIN + (point.y - minY) * scale;
+        return `${index === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+      });
+      return commands.join(" ");
+    });
+
+  return { viewBox: `0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`, paths };
+}

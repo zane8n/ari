@@ -1,0 +1,159 @@
+"use client";
+
+import * as AlertDialog from "@radix-ui/react-alert-dialog";
+import { useRef, useState, type Dispatch, type MouseEvent } from "react";
+import { experienceCopy } from "@/content/experience-copy";
+import { wishJokeResponses } from "@/content/response-copy";
+import { GlassAction } from "@/components/controls/GlassAction";
+import { CoinIcon, LetterIcon, MoonIcon, SuitcaseIcon } from "@/components/icons/SceneIcons";
+import { useReducedMotion } from "@/lib/motion/m";
+import type { ExperienceAction, ExperienceState } from "@/lib/experience/types";
+import type { WishOptionId } from "@/lib/experience/ids";
+
+const MAX_MONEY_ATTEMPTS = 3;
+
+export function WishScene({
+  state,
+  dispatch,
+}: {
+  state: ExperienceState;
+  dispatch: Dispatch<ExperienceAction>;
+}) {
+  const reducedMotion = useReducedMotion();
+  const cardRef = useRef<HTMLDivElement>(null);
+  const moneyRef = useRef<HTMLButtonElement>(null);
+  const [moneyAttempts, setMoneyAttempts] = useState(0);
+  const [moneyOffset, setMoneyOffset] = useState({ x: 0, y: 0, rotate: 0 });
+  const [message, setMessage] = useState<string | null>(null);
+
+  const moneySettled = moneyAttempts >= MAX_MONEY_ATTEMPTS;
+
+  function skipEvasion(): boolean {
+    return reducedMotion || window.innerWidth < 350;
+  }
+
+  function resolveMoney(isKeyboard: boolean): void {
+    if (moneySettled) return;
+    const next = moneyAttempts + 1;
+
+    if (isKeyboard || skipEvasion() || next >= MAX_MONEY_ATTEMPTS) {
+      setMoneyAttempts(MAX_MONEY_ATTEMPTS);
+      setMoneyOffset((prev) => ({ ...prev, rotate: 1.5 }));
+      setMessage(wishJokeResponses.money);
+      return;
+    }
+
+    setMoneyAttempts(next);
+    const cardBounds = cardRef.current?.getBoundingClientRect();
+    const tileBounds = moneyRef.current?.getBoundingClientRect();
+    const maxX = cardBounds && tileBounds ? Math.max(16, (cardBounds.width - tileBounds.width) / 2 - 8) : 56;
+    const maxY = cardBounds && tileBounds ? Math.max(12, (cardBounds.height - tileBounds.height) / 2 - 8) : 24;
+    const magnitude = 56 + Math.random() * 32;
+    const angle = Math.random() * Math.PI * 2;
+    setMoneyOffset({
+      x: Math.max(-maxX, Math.min(maxX, Math.cos(angle) * magnitude)),
+      y: Math.max(-maxY, Math.min(maxY, Math.sin(angle) * magnitude * 0.4)),
+      rotate: 0,
+    });
+  }
+
+  function handleMoneyClick(event: MouseEvent<HTMLButtonElement>): void {
+    resolveMoney(event.detail === 0);
+  }
+
+  function handleJoke(id: Exclude<WishOptionId, "vacation" | "money">): void {
+    setMessage(wishJokeResponses[id]);
+  }
+
+  return (
+    <div ref={cardRef} className="glass-surface flex flex-col gap-6 px-6 py-9">
+      <h1 className="font-display text-[clamp(1.9rem,7vw,2.3rem)] leading-[1.05] text-ink">
+        {experienceCopy.wish.question}
+      </h1>
+
+      <div className="relative grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <button
+          ref={moneyRef}
+          type="button"
+          onClick={handleMoneyClick}
+          disabled={moneySettled}
+          aria-disabled={moneySettled}
+          className="choice-tile focus-ring relative flex items-center gap-3 px-4 py-3 text-left"
+          style={{
+            transform: `translate(${moneyOffset.x}px, ${moneyOffset.y}px) rotate(${moneyOffset.rotate}deg)`,
+            transition: "transform 260ms cubic-bezier(.22,1,.36,1)",
+            opacity: moneySettled ? 0.6 : 1,
+            zIndex: moneyOffset.x !== 0 || moneyOffset.y !== 0 ? 10 : undefined,
+          }}
+        >
+          <CoinIcon className="h-7 w-7 shrink-0 text-accent-strong" />
+          <span className="text-[15.5px] font-semibold text-ink">{experienceCopy.wish.options.money}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => dispatch({ type: "wishConfirmRequested" })}
+          className="choice-tile focus-ring flex items-center gap-3 px-4 py-3 text-left"
+        >
+          <SuitcaseIcon className="h-7 w-7 shrink-0 text-accent-strong" />
+          <span className="text-[15.5px] font-semibold text-ink">{experienceCopy.wish.options.vacation}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleJoke("love-letter")}
+          className="choice-tile focus-ring flex items-center gap-3 px-4 py-3 text-left"
+        >
+          <LetterIcon className="h-7 w-7 shrink-0 text-accent-strong" />
+          <span className="text-[15.5px] font-semibold text-ink">{experienceCopy.wish.options["love-letter"]}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleJoke("peace-and-sleep")}
+          className="choice-tile focus-ring flex items-center gap-3 px-4 py-3 text-left"
+        >
+          <MoonIcon className="h-7 w-7 shrink-0 text-accent-strong" />
+          <span className="text-[15.5px] font-semibold text-ink">{experienceCopy.wish.options["peace-and-sleep"]}</span>
+        </button>
+      </div>
+
+      <p aria-live="polite" className="min-h-[1.5rem] text-sm text-ink-muted">
+        {message}
+      </p>
+
+      <AlertDialog.Root open={state.stage === "wishConfirm"}>
+        <AlertDialog.Portal>
+          <AlertDialog.Overlay
+            className="fixed inset-0 z-50"
+            style={{ background: "color-mix(in oklab, var(--accent-strong) 30%, transparent)" }}
+          />
+          <AlertDialog.Content className="glass-surface fixed inset-x-4 bottom-4 z-50 px-6 py-7 sm:inset-x-auto sm:left-1/2 sm:top-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2">
+            <AlertDialog.Title className="font-display text-2xl text-ink">
+              {experienceCopy.wishConfirm.title}
+            </AlertDialog.Title>
+            <AlertDialog.Description className="mt-3 text-base text-ink-muted">
+              {experienceCopy.wishConfirm.body}
+            </AlertDialog.Description>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row-reverse">
+              <AlertDialog.Action asChild>
+                <GlassAction
+                  variant="primary"
+                  trailingArrow
+                  onClick={() => dispatch({ type: "wishConfirmed", at: new Date().toISOString() })}
+                >
+                  {experienceCopy.wishConfirm.confirm}
+                </GlassAction>
+              </AlertDialog.Action>
+              <AlertDialog.Cancel asChild>
+                <GlassAction variant="secondary" onClick={() => dispatch({ type: "wishConfirmDismissed" })}>
+                  {experienceCopy.wishConfirm.cancel}
+                </GlassAction>
+              </AlertDialog.Cancel>
+            </div>
+          </AlertDialog.Content>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
+    </div>
+  );
+}
