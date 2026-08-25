@@ -7,7 +7,7 @@
  */
 export const experienceCopy = {
   arrival: {
-    title: "Hey!! You found your gift.",
+    title: "Hey!! You found your last gift.",
     body: "Okay fine — you found the secret part of the internet that's a little obsessed with you. Let it meet you properly first.",
     action: "Let's go!",
     ariaLabel: "A private, playful birthday experience made just for you.",
