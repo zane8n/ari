@@ -32,7 +32,7 @@
   --accent-strong: #4772a8;
   --accent-soft: #d8e4fa;
   --accent-mist: #ebecf9;
-  --accent-glow: rgb(92 180 255 / 0.32);
+  --accent-glow: rgb(92 180 255 / 0.26);
   --accent-foreground: #fbf2f8;
 
   /* No rounded anything, anywhere — a deliberate, flat, mystical geometry. */
@@ -106,6 +106,45 @@ h3 {
   border: 1px solid color-mix(in oklab, var(--gilt) 55%, var(--hairline));
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-glow);
+}
+
+/**
+ * The agreement's "ancient script" treatment — aged-paper tones, the same
+ * generated grain texture used elsewhere (now doing double duty as paper
+ * fiber), a soft foxed vignette at the corners, and a double gilt hairline.
+ * Deliberately its own warm sepia palette rather than the app's cool
+ * ink/canvas — it should read as a different, older document.
+ */
+.parchment-panel {
+  position: relative;
+  background:
+    radial-gradient(120% 90% at 12% 8%, rgb(120 78 30 / 0.1), transparent 55%),
+    radial-gradient(120% 90% at 88% 96%, rgb(120 78 30 / 0.12), transparent 55%),
+    linear-gradient(165deg, #f8efd9, #f0e0bd 55%, #e9d5a8);
+  border: 1px solid #b4903f99;
+  box-shadow:
+    inset 0 0 0 4px #fdf7e8,
+    inset 0 0 0 5px #b4903f55,
+    var(--shadow-glow);
+}
+
+.parchment-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+}
+
+.parchment-ink {
+  color: #4a3418;
+}
+
+.parchment-ink-muted {
+  color: #8a6f45;
 }
 
 .action-primary {
@@ -252,6 +291,34 @@ h3 {
   animation: ambient-rotate 220s linear infinite;
 }
 
+.palette-spin {
+  animation: ambient-rotate 22s linear infinite;
+}
+
+/** A one-shot light sweep across a freshly-landed joke response — the "pop". */
+@keyframes shimmer-sweep {
+  from {
+    background-position: -150% 0;
+  }
+  to {
+    background-position: 250% 0;
+  }
+}
+
+.shimmer-pop {
+  overflow: hidden;
+}
+
+.shimmer-pop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 0.65) 45%, transparent 65%);
+  background-size: 250% 100%;
+  animation: shimmer-sweep 1s ease-out 1;
+  pointer-events: none;
+}
+
 @keyframes ambient-sway {
   0%,
   100% {
@@ -270,8 +337,40 @@ h3 {
 
 .ambient-paused .ambient-drift,
 .ambient-paused .ambient-rotate,
-.ambient-paused .ambient-sway {
+.ambient-paused .ambient-sway,
+.ambient-paused .ambient-vignette {
   animation-play-state: paused;
+}
+
+/*
+ * A wide, soft, cloudy-blur wash pooling in each corner — the "dreamy edges"
+ * the whole ambient system sits inside. Oversized past the viewport (inset:
+ * -10%) so the blur never clips into a hard edge, and blurred rather than a
+ * flat gradient so it reads as atmosphere, not a shape.
+ */
+@keyframes ambient-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+.ambient-vignette {
+  position: absolute;
+  inset: -12%;
+  background:
+    radial-gradient(ellipse 52% 44% at 4% 2%, color-mix(in oklab, var(--accent) 42%, transparent), transparent 72%),
+    radial-gradient(ellipse 48% 40% at 98% 6%, color-mix(in oklab, var(--gilt) 34%, transparent), transparent 70%),
+    radial-gradient(ellipse 56% 46% at 6% 98%, color-mix(in oklab, var(--gilt) 30%, transparent), transparent 72%),
+    radial-gradient(ellipse 52% 44% at 96% 96%, color-mix(in oklab, var(--accent) 38%, transparent), transparent 72%);
+  filter: blur(70px);
+  animation: ambient-breathe 18s ease-in-out infinite;
+  transition: background 900ms ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {

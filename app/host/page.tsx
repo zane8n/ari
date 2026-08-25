@@ -83,7 +83,7 @@ export default async function HostPage() {
                 <p className="text-ink">
                   <strong>Travel personality:</strong> {experienceCopy.travelPersona.options[decrypted.travelPersona]}
                 </p>
-                <p className="text-ink">
+                <p className="text-ink break-words">
                   <strong>One thing not to miss:</strong>{" "}
                   {decrypted.mustNotMiss.kind === "surprise"
                     ? experienceCopy.mustNotMiss.surpriseOption

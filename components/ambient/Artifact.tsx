@@ -2,7 +2,15 @@
 
 import { forwardRef } from "react";
 import type { ArtifactKind, ArtifactPlacement } from "@/lib/ambient/layout";
-import { CompassIcon, HeartSparkIcon, RibbonBadgeIcon, RoseIcon, SprigIcon } from "@/components/icons/Decorative";
+import {
+  CompassIcon,
+  HeartSparkIcon,
+  MapTrailIcon,
+  RibbonBadgeIcon,
+  RoseIcon,
+  SprigIcon,
+  VineCornerIcon,
+} from "@/components/icons/Decorative";
 import { type MotionValue, m, useTransform } from "@/lib/motion/m";
 
 const SHAPES: Record<ArtifactKind, (props: { className?: string }) => React.JSX.Element> = {
@@ -11,10 +19,12 @@ const SHAPES: Record<ArtifactKind, (props: { className?: string }) => React.JSX.
   halo: HeartSparkIcon,
   route: CompassIcon,
   seal: RoseIcon,
+  vine: VineCornerIcon,
+  trail: MapTrailIcon,
 };
 
 /** Foliage sways rather than drifting flat — it reads more alive. */
-const SWAY_KINDS = new Set<ArtifactKind>(["pebble", "seal"]);
+const SWAY_KINDS = new Set<ArtifactKind>(["pebble", "seal", "vine"]);
 
 type ArtifactProps = {
   placement: ArtifactPlacement;
@@ -44,8 +54,8 @@ export const Artifact = forwardRef<HTMLDivElement, ArtifactProps>(function Artif
         color: "var(--accent)",
         x,
         y,
-        opacity: illuminated ? 0.95 : 0.62,
-        filter: illuminated ? "drop-shadow(0 0 12px var(--accent-glow))" : "drop-shadow(0 0 5px var(--accent-glow))",
+        opacity: illuminated ? 0.8 : 0.4,
+        filter: illuminated ? "drop-shadow(0 0 10px var(--accent-glow))" : "drop-shadow(0 0 4px var(--accent-glow))",
         transition: "opacity 420ms ease-out, filter 420ms ease-out",
       }}
     >

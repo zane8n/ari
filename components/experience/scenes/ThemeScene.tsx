@@ -6,6 +6,7 @@ import { experienceCopy } from "@/content/experience-copy";
 import { GlassAction } from "@/components/controls/GlassAction";
 import { CANVAS, INK, THEME_LIST, getTheme, type ThemeId, type ThemeRecord } from "@/lib/theme/themes";
 import { mix } from "@/lib/theme/color";
+import { m } from "@/lib/motion/m";
 import type { ExperienceAction, ExperienceState } from "@/lib/experience/types";
 
 const PREVIEW_DELAY_MS = 700;
@@ -135,19 +136,25 @@ export function ThemeScene({
                 onChange={() => selectTheme(theme.id, true)}
                 className="sr-only"
               />
-              <span
+              <m.span
                 aria-hidden="true"
-                className="rounded-full transition-all duration-300"
+                className="relative block overflow-hidden rounded-full"
+                animate={{ width: isActive ? 96 : 68, height: isActive ? 96 : 68, opacity: isActive ? 1 : 0.58 }}
+                transition={{ type: "spring", stiffness: 260, damping: 22 }}
                 style={{
-                  width: isActive ? 96 : 68,
-                  height: isActive ? 96 : 68,
-                  background: theme.accent,
                   boxShadow: isActive
                     ? `0 0 34px -4px ${theme.tokens.accentGlow}, inset 0 3px 6px rgb(255 255 255 / 0.4), inset 0 -3px 8px rgb(0 0 0 / 0.16)`
                     : "inset 0 2px 3px rgb(255 255 255 / 0.35), inset 0 -2px 4px rgb(0 0 0 / 0.14)",
-                  opacity: isActive ? 1 : 0.55,
                 }}
-              />
+              >
+                {/* A palette wheel, not one flat dot — the three tones this theme is built from. */}
+                <span
+                  className={`absolute inset-[-25%] ${isActive ? "palette-spin" : ""}`}
+                  style={{
+                    background: `conic-gradient(from 0deg, ${theme.tokens.accentStrong}, ${theme.accent} 30%, ${theme.tokens.accentSoft} 55%, ${theme.accent} 75%, ${theme.tokens.accentStrong} 100%)`,
+                  }}
+                />
+              </m.span>
               <span
                 className="text-center text-[13.5px] leading-tight font-semibold transition-colors duration-300"
                 style={{ color: isActive ? "var(--ink)" : DIMMED_LABEL_COLOR }}

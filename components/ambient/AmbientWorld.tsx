@@ -79,6 +79,7 @@ export function AmbientWorld({ state }: { state: ExperienceState }) {
       className={`pointer-events-none fixed inset-0 overflow-hidden ${hidden ? "ambient-paused" : ""}`}
       style={{ opacity: intensity, transition: "opacity 600ms ease-out" }}
     >
+      <div className="ambient-vignette" />
       {placements.map((placement) => (
         <Artifact
           key={placement.id}

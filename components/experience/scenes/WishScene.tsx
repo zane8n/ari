@@ -117,20 +117,21 @@ export function WishScene({
         </button>
       </div>
 
-      <div aria-live="polite" className="min-h-[3.5rem]">
+      <div aria-live="polite" className="flex min-h-[5rem] items-center justify-center">
         <AnimatePresence mode="wait">
           {message && (
             <m.div
               key={message}
-              initial={{ opacity: 0, y: 12, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 320, damping: 20 }}
-              className="flex items-start gap-2 border-l-2 py-1 pl-3"
-              style={{ borderColor: "var(--accent)" }}
+              initial={{ opacity: 0, scale: 0.65, rotate: -4 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 0.85 }}
+              transition={{ type: "spring", stiffness: 380, damping: 16 }}
+              className="shimmer-pop relative flex items-center gap-3 border px-5 py-4 text-center"
+              style={{ borderColor: "var(--accent)", background: "var(--accent-soft)" }}
             >
-              <SparkleIcon className="mt-1 h-4 w-4 shrink-0 text-accent-strong" />
-              <p className="font-display text-lg leading-snug text-ink italic">{message}</p>
+              <SparkleIcon className="h-5 w-5 shrink-0 text-accent-strong" />
+              <p className="font-display text-xl leading-snug text-ink">{message}</p>
+              <SparkleIcon className="h-5 w-5 shrink-0 text-accent-strong" />
             </m.div>
           )}
         </AnimatePresence>
@@ -142,7 +143,23 @@ export function WishScene({
             className="fixed inset-0 z-50"
             style={{ background: "color-mix(in oklab, var(--accent-strong) 38%, transparent)" }}
           />
-          <AlertDialog.Content className="aura-panel-solid fixed inset-x-4 bottom-4 z-50 px-7 py-8 sm:inset-x-auto sm:top-1/2 sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2">
+          {/*
+            Anchored from top-1/2 with a translate, on every breakpoint —
+            not bottom-4 on mobile. iOS Safari's dynamic toolbar makes the
+            visual viewport's bottom edge unstable mid-interaction, which put
+            a bottom-anchored sheet fully off-screen on a real iPhone. The
+            top-anchored center is stable regardless, and max-height plus
+            scroll is a safety net for short viewports.
+          */}
+          {/*
+            !fixed: .aura-panel-solid itself sets `position: relative`, and
+            since that custom class rule compiles after Tailwind's utilities
+            in source order, plain `fixed` loses the cascade at equal
+            specificity — the dialog silently rendered `position: relative`
+            in normal document flow (this, not any iOS-specific quirk, is
+            what put it far off-screen). `!fixed` forces the win.
+          */}
+          <AlertDialog.Content className="aura-panel-solid !fixed inset-x-4 top-1/2 z-50 max-h-[calc(100svh-2rem)] -translate-y-1/2 overflow-y-auto px-7 py-8 sm:inset-x-auto sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2">
             <AlertDialog.Title className="font-display text-[1.9rem] leading-tight text-ink">
               {experienceCopy.wishConfirm.title}
             </AlertDialog.Title>

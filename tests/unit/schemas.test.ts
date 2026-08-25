@@ -45,10 +45,10 @@ describe("spoilModesSchema", () => {
 });
 
 describe("mustNotMissSchema", () => {
-  it("requires 2-280 characters for text answers", () => {
+  it("requires 2-180 characters for text answers", () => {
     expect(mustNotMissSchema.safeParse({ kind: "text", value: "a" }).success).toBe(false);
     expect(mustNotMissSchema.safeParse({ kind: "text", value: "ok" }).success).toBe(true);
-    expect(mustNotMissSchema.safeParse({ kind: "text", value: "a".repeat(281) }).success).toBe(false);
+    expect(mustNotMissSchema.safeParse({ kind: "text", value: "a".repeat(181) }).success).toBe(false);
   });
 
   it("allows the surprise flag with no text at all", () => {

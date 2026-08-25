@@ -78,7 +78,7 @@ export function SignatureSurface({
       });
       pad.addEventListener("endStroke", () => {
         isDrawingRef.current = false;
-        setHasStroke(!pad.isEmpty());
+        setHasStroke(pad.toData().some((group) => group.points.length >= 2));
       });
       padRef.current = pad;
       sizeCanvas();
@@ -123,9 +123,16 @@ export function SignatureSurface({
     }
     if (!padRef.current || padRef.current.isEmpty()) return;
     const groups = padRef.current.toData();
+    // A quick lift-and-retouch (dotting an "i", a brief flourish) can land a
+    // stroke group with a single point — signature_pad still records it, but
+    // the payload schema requires 2+ points per group. Multi-pass signing is
+    // the normal case, so drop those single-point taps rather than letting
+    // the whole seal silently fail validation.
+    const validGroups = groups.filter((group) => group.points.length >= 2);
+    if (validGroups.length === 0) return;
     onCapture({
       kind: "drawn",
-      points: groups.map((group) => group.points.map((point) => ({ x: point.x, y: point.y, time: point.time, pressure: point.pressure }))),
+      points: validGroups.map((group) => group.points.map((point) => ({ x: point.x, y: point.y, time: point.time, pressure: point.pressure }))),
     });
   }
 

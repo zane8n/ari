@@ -44,10 +44,10 @@ describe("canSubmitMustNotMiss", () => {
   it("surprise flag is always valid", () => {
     expect(canSubmitMustNotMiss({ kind: "surprise" })).toBe(true);
   });
-  it("text must be 2-280 trimmed characters", () => {
+  it("text must be 2-180 trimmed characters", () => {
     expect(canSubmitMustNotMiss({ kind: "text", value: "a" })).toBe(false);
     expect(canSubmitMustNotMiss({ kind: "text", value: "ok" })).toBe(true);
-    expect(canSubmitMustNotMiss({ kind: "text", value: "a".repeat(281) })).toBe(false);
+    expect(canSubmitMustNotMiss({ kind: "text", value: "a".repeat(181) })).toBe(false);
   });
 });
 

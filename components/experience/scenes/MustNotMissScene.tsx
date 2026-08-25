@@ -45,14 +45,14 @@ export function MustNotMissScene({
 
       <textarea
         value={text}
-        onChange={(event) => setText(event.target.value.slice(0, 280))}
+        onChange={(event) => setText(event.target.value.slice(0, 180))}
         disabled={surprise}
         rows={4}
-        maxLength={280}
+        maxLength={180}
         aria-label={experienceCopy.mustNotMiss.prompt}
         className="aura-panel-solid focus-ring min-h-[120px] w-full resize-none px-4 py-3 text-base text-ink outline-none disabled:opacity-50"
       />
-      {text.length > 220 && <p className="text-right text-xs text-ink-muted">{text.length}/280</p>}
+      {text.length > 140 && <p className="text-right text-xs text-ink-muted">{text.length}/180</p>}
 
       <label className="flex items-center gap-3 text-sm text-ink">
         <input

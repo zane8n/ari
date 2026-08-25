@@ -6,9 +6,9 @@ import type { TravelPersonaId, WishOptionId } from "@/lib/experience/ids";
  * lives here, hand-authored once, never generated on the fly.
  */
 export const wishJokeResponses: Record<Exclude<WishOptionId, "vacation">, string> = {
-  money: "Excellent choice. Unfortunately, the finance department is also your boyfriend.",
-  "love-letter": "Already issued. Non-refundable.",
-  "peace-and-sleep": "Approved during transit. The rest of the birthday remains occupied.",
+  money: "DENIED. 💅 The finance department is also your boyfriend, and he already knows exactly what you're up to.",
+  "love-letter": "Already issued. 💌 47 pages, front and back, in my worst handwriting. No refunds. No notes. No takebacks.",
+  "peace-and-sleep": "Sleep: approved, but only until landing. 😴✈️ The second wheels touch down, I have plans and zero chill.",
 };
 
 export const travelPersonaAcknowledgements: Record<TravelPersonaId, string> = {

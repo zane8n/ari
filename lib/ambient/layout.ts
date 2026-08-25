@@ -18,7 +18,7 @@ export function mulberry32(seed: number): () => number {
   };
 }
 
-export type ArtifactKind = "pebble" | "ribbon" | "halo" | "route" | "seal";
+export type ArtifactKind = "pebble" | "ribbon" | "halo" | "route" | "seal" | "vine" | "trail";
 
 export type ArtifactPlacement = {
   id: string;
@@ -34,11 +34,17 @@ export type ArtifactPlacement = {
 };
 
 const IDENTITY_KINDS: ArtifactKind[] = ["pebble", "halo", "ribbon", "route", "seal"];
-const ALL_KINDS: ArtifactKind[] = ["pebble", "ribbon", "halo", "route", "seal"];
+/**
+ * Purely-decorative pool (never tied to milestone illumination) — "vine" is
+ * repeated so leaf/vine motifs turn up more often than the other kinds,
+ * per the ask for more of that texture specifically.
+ */
+const DECORATIVE_KINDS: ArtifactKind[] = ["vine", "vine", "trail", "seal", "pebble", "halo", "ribbon"];
 const DECORATIVE_ZONES: Array<{ top: [number, number]; left: [number, number] }> = [
   { top: [6, 20], left: [66, 92] },
   { top: [60, 80], left: [6, 26] },
   { top: [30, 44], left: [80, 96] },
+  { top: [16, 32], left: [4, 20] },
 ];
 
 /** One deterministic layout per invite (section 5.4: refresh must not feel randomly regenerated). */
@@ -72,7 +78,7 @@ export function buildAmbientLayout(inviteId: string, includeDecorative: boolean)
     DECORATIVE_ZONES.forEach((zone, index) => {
       placements.push({
         id: `extra-${index}`,
-        kind: ALL_KINDS[Math.floor(random() * ALL_KINDS.length)],
+        kind: DECORATIVE_KINDS[Math.floor(random() * DECORATIVE_KINDS.length)],
         topPercent: zone.top[0] + random() * (zone.top[1] - zone.top[0]),
         leftPercent: zone.left[0] + random() * (zone.left[1] - zone.left[0]),
         sizePx: 26 + random() * 18,

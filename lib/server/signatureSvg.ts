@@ -21,13 +21,18 @@ export function buildSignaturePaths(groups: SignaturePointGroup[]): { viewBox: s
   const spanX = Math.max(maxX - minX, 1);
   const spanY = Math.max(maxY - minY, 1);
   const scale = Math.min((VIEW_WIDTH - MARGIN * 2) / spanX, (VIEW_HEIGHT - MARGIN * 2) / spanY);
+  // Scaling to fit only pins the content to the top-left corner unless the
+  // signature's aspect ratio happens to match the box exactly — center the
+  // scaled result within the remaining space on both axes.
+  const offsetX = (VIEW_WIDTH - spanX * scale) / 2;
+  const offsetY = (VIEW_HEIGHT - spanY * scale) / 2;
 
   const paths = groups
     .filter((group) => group.length > 1)
     .map((group) => {
       const commands = group.map((point, index) => {
-        const x = MARGIN + (point.x - minX) * scale;
-        const y = MARGIN + (point.y - minY) * scale;
+        const x = offsetX + (point.x - minX) * scale;
+        const y = offsetY + (point.y - minY) * scale;
         return `${index === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
       });
       return commands.join(" ");

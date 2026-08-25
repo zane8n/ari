@@ -34,7 +34,18 @@ test.describe("full recipient journey", () => {
     await expect(page.getByText(/finance department is also your boyfriend/)).toBeVisible();
 
     await page.getByRole("button", { name: "A vacation" }).click();
-    await page.getByRole("button", { name: "Yes — whisk me away" }).click();
+    // Regression check: this dialog once rendered fully below the visible
+    // viewport on a real iPhone (a bottom-anchored `position: fixed` sheet
+    // fighting Safari's dynamic toolbar) — assert its confirm button is
+    // actually within the viewport bounds, not merely CSS-"visible".
+    const confirmVacation = page.getByRole("button", { name: "Yes — whisk me away" });
+    await expect(confirmVacation).toBeVisible();
+    const viewport = page.viewportSize();
+    const confirmBox = await confirmVacation.boundingBox();
+    if (!viewport || !confirmBox) throw new Error("could not measure the vacation-confirm dialog");
+    expect(confirmBox.y).toBeGreaterThanOrEqual(0);
+    expect(confirmBox.y + confirmBox.height).toBeLessThanOrEqual(viewport.height);
+    await confirmVacation.click();
 
     await page.getByText("Slow mornings with no alarms").click();
     await page.getByRole("button", { name: "Shall we proceed?" }).click();
@@ -68,10 +79,13 @@ test.describe("full recipient journey", () => {
     await page.mouse.down();
     await page.mouse.move(box.x + box.width - 20, box.y + box.height / 2 - 30, { steps: 8 });
     await page.mouse.up();
-    // Second, separate stroke — regression check for the resize-wipes-canvas bug.
+    // Second stroke: a brief lift-and-retouch with zero movement (dotting an
+    // "i", a quick flourish) — this used to land a stroke group with a
+    // single point, which the payload schema rejects (groups need 2+
+    // points), silently failing the whole seal on submit. Multi-pass
+    // signing is the normal case, so this is the real regression to guard.
     await page.mouse.move(box.x + 30, box.y + box.height / 2 + 20);
     await page.mouse.down();
-    await page.mouse.move(box.x + box.width - 30, box.y + box.height / 2 + 40, { steps: 6 });
     await page.mouse.up();
 
     // Force the first seal attempt to fail — the app must show Retry, never a fake reveal.

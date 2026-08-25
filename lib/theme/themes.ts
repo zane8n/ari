@@ -48,14 +48,14 @@ const THEME_SEEDS: readonly ThemeSeed[] = [
   { id: "poppy-kiss", displayName: "Poppy Kiss", accent: "#FF5C5C", character: "Bright, bold, a little dangerous" },
   { id: "peach-bellini", displayName: "Peach Bellini", accent: "#FFA368", character: "Warm, giggly, golden-hour peach" },
   { id: "golden-hour", displayName: "Golden Hour", accent: "#FFC94D", character: "Sun-warmed and glowing" },
-  { id: "champagne-fizz", displayName: "Champagne Fizz", accent: "#F0DD6E", character: "Bubbly and celebratory" },
-  { id: "mint-crush", displayName: "Mint Crush", accent: "#4FE0B0", character: "Fresh, sparkling, a little cheeky" },
-  { id: "lagoon-kiss", displayName: "Lagoon Kiss", accent: "#3DD1E0", character: "Clear water, secret cove" },
+  { id: "champagne-fizz", displayName: "Champagne Fizz", accent: "#FAE04C", character: "Bubbly and celebratory" },
+  { id: "mint-crush", displayName: "Mint Crush", accent: "#19F0A9", character: "Fresh, sparkling, a little cheeky" },
+  { id: "lagoon-kiss", displayName: "Lagoon Kiss", accent: "#0DDBF2", character: "Clear water, secret cove" },
   { id: "sky-flirt", displayName: "Sky Flirt", accent: "#5CB4FF", character: "Daydreamy periwinkle blue" },
   { id: "lilac-dream", displayName: "Lilac Dream", accent: "#B48CFF", character: "Soft, floaty, a little magical" },
   { id: "violet-hour", displayName: "Violet Hour", accent: "#9C5CFF", character: "Twilight, deeper and dreamier" },
-  { id: "plum-fizz", displayName: "Plum Fizz", accent: "#E056D9", character: "Bold fuchsia, no apologies" },
-  { id: "rose-gold", displayName: "Rosé Gold", accent: "#FFB4A0", character: "Warm, luminous, endlessly flattering" },
+  { id: "plum-fizz", displayName: "Plum Fizz", accent: "#F22CE8", character: "Bold fuchsia, no apologies" },
+  { id: "rose-gold", displayName: "Rosé Gold", accent: "#FF9B80", character: "Warm, luminous, endlessly flattering" },
 ];
 
 /**
@@ -81,7 +81,7 @@ function buildTheme(seed: ThemeSeed): ThemeRecord {
   const accentStrong = darkenUntilAccessible(seed.accent);
   const accentSoft = mix(seed.accent, CANVAS, 22);
   const accentMist = mix(seed.accent, CANVAS, 10);
-  const accentGlow = rgbToRgba(hexToRgb(seed.accent), 0.32);
+  const accentGlow = rgbToRgba(hexToRgb(seed.accent), 0.26);
   const actionForeground = pickContrastSafeForeground(accentStrong, [IVORY_FOREGROUND, INK_FOREGROUND]);
 
   return {

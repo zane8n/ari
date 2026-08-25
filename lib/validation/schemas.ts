@@ -28,7 +28,7 @@ export const travelPersonaIdSchema = z.enum(TRAVEL_PERSONA_IDS);
 export const mustNotMissSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("text"),
-    value: z.string().trim().min(2, "A couple more characters.").max(280, "Keep it under 280 characters."),
+    value: z.string().trim().min(2, "A couple more characters.").max(180, "Keep it under 180 characters."),
   }),
   z.object({ kind: z.literal("surprise") }),
 ]);

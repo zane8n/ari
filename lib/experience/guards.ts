@@ -28,7 +28,7 @@ export function canConfirmTravelPersona(persona: TravelPersonaId | null): person
 export function canSubmitMustNotMiss(value: MustNotMiss): boolean {
   if (value.kind === "surprise") return true;
   const trimmed = value.value.trim();
-  return trimmed.length >= 2 && trimmed.length <= 280;
+  return trimmed.length >= 2 && trimmed.length <= 180;
 }
 
 /** "review -> agreement | entire state schema passes" (section 13.1). */
