@@ -6,6 +6,7 @@ import type { SerializedBudgetItem } from "@/lib/server/trip";
 import { convertFromUsd, formatMoney, type ExchangeRates } from "@/lib/currency/convert";
 import { ratesApi } from "./tripApi";
 import { BudgetTab } from "./BudgetTab";
+import { InsightsTab } from "./InsightsTab";
 import { ItineraryTab } from "./ItineraryTab";
 
 const CURRENCIES: Currency[] = ["USD", "KES", "TZS"];
@@ -31,7 +32,7 @@ export function TripApp({
   tripDays: TripDay[];
   meta: { destination: string; homeBase: string; cashBudgetUsd: number; reserveBudgetUsd: number };
 }) {
-  const [tab, setTab] = useState<"itinerary" | "budget">("itinerary");
+  const [tab, setTab] = useState<"itinerary" | "budget" | "insights">("itinerary");
   const [currency, setCurrency] = useState<Currency>("USD");
   const [rates, setRates] = useState<ExchangeRates>(FALLBACK_RATES);
   const [ratesFetchedAt, setRatesFetchedAt] = useState<string | null>(null);
@@ -94,7 +95,7 @@ export function TripApp({
 
       <div className="flex items-center justify-between gap-3">
         <div className="flex gap-1 rounded-lg bg-black/5 p-1">
-          {(["itinerary", "budget"] as const).map((value) => (
+          {(["itinerary", "budget", "insights"] as const).map((value) => (
             <button
               key={value}
               type="button"
@@ -137,9 +138,10 @@ export function TripApp({
         </div>
       )}
 
-      {tab === "itinerary" ? (
+      {tab === "itinerary" && (
         <ItineraryTab events={events} setEvents={setEvents} budgetItems={budgetItems} money={money} onError={reportError} tripDays={tripDays} />
-      ) : (
+      )}
+      {tab === "budget" && (
         <BudgetTab
           budgetItems={budgetItems}
           setBudgetItems={setBudgetItems}
@@ -150,6 +152,7 @@ export function TripApp({
           tripDays={tripDays}
         />
       )}
+      {tab === "insights" && <InsightsTab budgetItems={budgetItems} events={events} tripDays={tripDays} meta={meta} money={money} />}
     </main>
   );
 }
