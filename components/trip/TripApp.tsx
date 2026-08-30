@@ -76,14 +76,33 @@ export function TripApp({
 
   return (
     <main className="mx-auto flex min-h-[100svh] max-w-3xl flex-col gap-6 px-5 py-8 text-ink" style={{ background: "var(--canvas)" }}>
-      <header className="flex flex-col gap-1">
+      <header className="flex flex-col gap-2">
         <a href="/host" className="text-xs text-ink-muted underline">
           ← Host view
         </a>
-        <h1 className="font-display text-2xl text-ink">Trip tracker</h1>
-        <p className="text-sm text-ink-muted">
-          {meta.destination} · {formatTripDates(tripDays)} · {meta.homeBase}
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="font-display text-2xl text-ink">Trip tracker</h1>
+            <p className="text-sm text-ink-muted">
+              {meta.destination} · {formatTripDates(tripDays)} · {meta.homeBase}
+            </p>
+          </div>
+          <div className="flex shrink-0 gap-0.5 rounded-lg bg-black/5 p-1">
+            {CURRENCIES.map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setCurrency(value)}
+                className={`min-w-11 rounded-md px-2 py-2 text-xs font-semibold transition-colors ${
+                  currency === value ? "bg-white text-ink shadow-sm" : "text-ink-muted"
+                }`}
+              >
+                {value}
+              </button>
+            ))}
+          </div>
+        </div>
+        {ratesFetchedAt && <p className="text-right text-[11px] text-ink-muted">Rates updated {new Date(ratesFetchedAt).toLocaleDateString()}</p>}
       </header>
 
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -93,41 +112,20 @@ export function TripApp({
         <SummaryTile label="Reserve remaining" value={money(summary.reserveRemaining)} emphasis={summary.reserveRemaining < 0} />
       </section>
 
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex gap-1 rounded-lg bg-black/5 p-1">
-          {(["itinerary", "budget", "insights"] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setTab(value)}
-              className={`rounded-md px-4 py-1.5 text-sm font-medium capitalize transition-colors ${
-                tab === value ? "bg-white text-ink shadow-sm" : "text-ink-muted"
-              }`}
-            >
-              {value}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex gap-1 rounded-lg bg-black/5 p-1">
-          {CURRENCIES.map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setCurrency(value)}
-              className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
-                currency === value ? "bg-white text-ink shadow-sm" : "text-ink-muted"
-              }`}
-            >
-              {value}
-            </button>
-          ))}
-        </div>
+      <div className="grid grid-cols-3 gap-1 rounded-lg bg-black/5 p-1">
+        {(["itinerary", "budget", "insights"] as const).map((value) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setTab(value)}
+            className={`rounded-md py-2.5 text-sm font-medium capitalize transition-colors ${
+              tab === value ? "bg-white text-ink shadow-sm" : "text-ink-muted"
+            }`}
+          >
+            {value}
+          </button>
+        ))}
       </div>
-
-      {ratesFetchedAt && (
-        <p className="-mt-3 text-right text-[11px] text-ink-muted">Rates updated {new Date(ratesFetchedAt).toLocaleDateString()}</p>
-      )}
 
       {globalError && (
         <div className="flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">

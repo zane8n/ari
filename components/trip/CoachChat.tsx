@@ -40,7 +40,7 @@ export function CoachChat() {
               key={prompt}
               type="button"
               onClick={() => handleSend(prompt)}
-              className="rounded-full border border-black/15 px-3 py-1.5 text-xs text-ink-muted hover:border-black/30 hover:text-ink"
+              className="rounded-full border border-black/15 px-3 py-2 text-xs text-ink-muted hover:border-black/30 hover:text-ink"
             >
               {prompt}
             </button>
@@ -85,12 +85,12 @@ export function CoachChat() {
           onChange={(event) => setInput(event.target.value)}
           placeholder="Ask the coach…"
           disabled={busy}
-          className="flex-1 rounded-md border border-black/15 px-3 py-2 text-sm outline-none focus:border-black/40 disabled:opacity-50"
+          className="min-w-0 flex-1 rounded-md border border-black/15 px-3 py-2.5 text-base outline-none focus:border-black/40 disabled:opacity-50"
         />
         <button
           type="submit"
           disabled={busy || !input.trim()}
-          className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="shrink-0 rounded-md bg-ink px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
         >
           {busy ? "…" : "Send"}
         </button>

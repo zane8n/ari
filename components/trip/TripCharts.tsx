@@ -76,15 +76,15 @@ export function CategoryDonut({ data, money }: { data: CategoryBreakdown[]; mone
   const chartData = data.map((row) => ({ ...row, value: row.actualUsd > 0 ? row.actualUsd : row.estimatedUsd }));
   return (
     <ChartCard title="Where the money goes" subtitle="By category — actual where logged, planned otherwise">
-      <ResponsiveContainer width="100%" height={240}>
-        <PieChart>
-          <Pie data={chartData} dataKey="value" nameKey="label" innerRadius={56} outerRadius={88} paddingAngle={2} strokeWidth={2} stroke={SURFACE}>
+      <ResponsiveContainer width="100%" height={280}>
+        <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+          <Pie data={chartData} dataKey="value" nameKey="label" cx="50%" cy="42%" innerRadius={56} outerRadius={88} paddingAngle={2} strokeWidth={2} stroke={SURFACE}>
             {chartData.map((row) => (
               <Cell key={row.category} fill={row.color} />
             ))}
           </Pie>
           <Tooltip contentStyle={tooltipStyle()} formatter={(value, _name, item) => [money(toNum(value)), item.payload.label]} />
-          <Legend wrapperStyle={{ fontSize: 12 }} layout="vertical" align="right" verticalAlign="middle" />
+          <Legend wrapperStyle={{ fontSize: 12, paddingTop: 12 }} layout="horizontal" align="center" verticalAlign="bottom" />
         </PieChart>
       </ResponsiveContainer>
     </ChartCard>
@@ -103,7 +103,7 @@ export function StatusDonut({ data }: { data: StatusBreakdown[] }) {
             ))}
           </Pie>
           <Tooltip contentStyle={tooltipStyle()} formatter={(value, _name, item) => [toNum(value), item.payload.label]} />
-          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
         </PieChart>
       </ResponsiveContainer>
     </ChartCard>

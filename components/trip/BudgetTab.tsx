@@ -96,7 +96,7 @@ export function BudgetTab({
         <button
           type="button"
           onClick={() => setShowAddForm(true)}
-          className="self-start rounded-lg border border-dashed border-black/20 px-4 py-2 text-sm text-ink-muted hover:border-black/40 hover:text-ink"
+          className="w-full rounded-lg border border-dashed border-black/20 py-3 text-sm text-ink-muted hover:border-black/40 hover:text-ink sm:w-auto sm:self-start sm:px-4"
         >
           + Add budget item
         </button>
@@ -187,7 +187,7 @@ function BudgetRow({
           <p className="mt-1 font-medium text-ink">{item.label}</p>
           {item.notes && <p className="mt-0.5 text-xs text-ink-muted">{item.notes}</p>}
         </div>
-        <button type="button" onClick={() => onDelete(item.id)} aria-label="Delete" className="shrink-0 p-1 text-ink-muted hover:text-red-600">
+        <button type="button" onClick={() => onDelete(item.id)} aria-label="Delete" className="-mr-2 shrink-0 p-2.5 text-ink-muted hover:text-red-600">
           ✕
         </button>
       </div>
@@ -224,21 +224,21 @@ function BudgetRow({
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
             placeholder="Amount"
-            className="w-28 rounded-md border border-black/15 px-2 py-1.5 text-sm outline-none focus:border-black/40"
+            className="w-28 rounded-md border border-black/15 px-2.5 py-2.5 text-base outline-none focus:border-black/40"
           />
           <select
             value={entryCurrency}
             onChange={(event) => setEntryCurrency(event.target.value as Currency)}
-            className="rounded-md border border-black/15 px-2 py-1.5 text-sm outline-none focus:border-black/40"
+            className="rounded-md border border-black/15 px-2.5 py-2.5 text-base outline-none focus:border-black/40"
           >
             <option value="USD">USD</option>
             <option value="KES">KES</option>
             <option value="TZS">TZS</option>
           </select>
-          <button type="button" onClick={handleSave} disabled={saving || !amount} className="rounded-md bg-ink px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50">
+          <button type="button" onClick={handleSave} disabled={saving || !amount} className="rounded-md bg-ink px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">
             {saving ? "Saving…" : "Save"}
           </button>
-          <button type="button" onClick={() => setLogging(false)} disabled={saving} className="rounded-md px-3 py-1.5 text-sm text-ink-muted">
+          <button type="button" onClick={() => setLogging(false)} disabled={saving} className="rounded-md px-3 py-2.5 text-sm text-ink-muted">
             Cancel
           </button>
           {rates && amount && Number.isFinite(Number.parseFloat(amount)) && entryCurrency !== "USD" && (
@@ -247,17 +247,17 @@ function BudgetRow({
           {error && <p className="w-full text-xs text-red-600">{error}</p>}
         </div>
       ) : (
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <button type="button" onClick={() => setLogging(true)} disabled={saving} className="text-xs font-medium text-ink underline disabled:opacity-50">
+        <div className="mt-2 flex flex-wrap items-center gap-1">
+          <button type="button" onClick={() => setLogging(true)} disabled={saving} className="-mx-1 rounded px-2 py-2 text-xs font-medium text-ink underline disabled:opacity-50">
             {hasActual ? "Edit actual" : "Log actual"}
           </button>
           {!hasActual && (
-            <button type="button" onClick={handleAcceptBudget} disabled={saving} className="text-xs font-medium text-ink underline disabled:opacity-50">
+            <button type="button" onClick={handleAcceptBudget} disabled={saving} className="rounded px-2 py-2 text-xs font-medium text-ink underline disabled:opacity-50">
               {saving ? "Saving…" : "Accept budget"}
             </button>
           )}
           {hasActual && (
-            <button type="button" onClick={handleClear} disabled={saving} className="text-xs text-ink-muted underline disabled:opacity-50">
+            <button type="button" onClick={handleClear} disabled={saving} className="rounded px-2 py-2 text-xs text-ink-muted underline disabled:opacity-50">
               Clear
             </button>
           )}
@@ -302,17 +302,17 @@ function AddBudgetItemForm({
         value={label}
         onChange={(event) => setLabel(event.target.value)}
         placeholder="What is this? e.g. Souvenir at Maasai Market"
-        className="rounded-md border border-black/15 px-3 py-2 text-sm outline-none focus:border-black/40"
+        className="rounded-md border border-black/15 px-3 py-2.5 text-base outline-none focus:border-black/40"
       />
       <div className="flex flex-wrap gap-2">
-        <select value={category} onChange={(event) => setCategory(event.target.value as BudgetCategory)} className="rounded-md border border-black/15 px-2 py-1.5 text-sm">
+        <select value={category} onChange={(event) => setCategory(event.target.value as BudgetCategory)} className="rounded-md border border-black/15 px-2 py-2.5 text-base">
           {BUDGET_CATEGORY_VALUES.map((value) => (
             <option key={value} value={value}>
               {CATEGORY_LABELS[value]}
             </option>
           ))}
         </select>
-        <select value={day} onChange={(event) => setDay(event.target.value)} className="rounded-md border border-black/15 px-2 py-1.5 text-sm">
+        <select value={day} onChange={(event) => setDay(event.target.value)} className="rounded-md border border-black/15 px-2 py-2.5 text-base">
           <option value="">No specific day</option>
           {tripDays.map((d) => (
             <option key={d.date} value={d.date}>
@@ -328,18 +328,18 @@ function AddBudgetItemForm({
           value={estimatedUsd}
           onChange={(event) => setEstimatedUsd(event.target.value)}
           placeholder="Est. USD"
-          className="w-28 rounded-md border border-black/15 px-2 py-1.5 text-sm"
+          className="w-28 rounded-md border border-black/15 px-2 py-2.5 text-base"
         />
-        <label className="flex items-center gap-1.5 text-xs text-ink-muted">
-          <input type="checkbox" checked={isReserve} onChange={(event) => setIsReserve(event.target.checked)} />
+        <label className="flex items-center gap-1.5 py-2 text-xs text-ink-muted">
+          <input type="checkbox" checked={isReserve} onChange={(event) => setIsReserve(event.target.checked)} className="h-4 w-4" />
           Reserve card
         </label>
       </div>
       <div className="flex gap-2">
-        <button type="submit" disabled={saving} className="rounded-md bg-ink px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50">
+        <button type="submit" disabled={saving} className="rounded-md bg-ink px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">
           Add
         </button>
-        <button type="button" onClick={onCancel} className="rounded-md px-3 py-1.5 text-sm text-ink-muted">
+        <button type="button" onClick={onCancel} className="rounded-md px-4 py-2.5 text-sm text-ink-muted">
           Cancel
         </button>
       </div>

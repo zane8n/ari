@@ -141,7 +141,7 @@ function DaySection({
           }}
         />
       ) : (
-        <button type="button" onClick={() => setShowAddForm(true)} className="self-start text-xs font-medium text-ink-muted underline">
+        <button type="button" onClick={() => setShowAddForm(true)} className="self-start rounded px-2 py-2 text-xs font-medium text-ink-muted underline">
           + Add activity
         </button>
       )}
@@ -195,21 +195,21 @@ function EventRow({
     <div className={`rounded-lg border border-black/10 bg-white px-4 py-3 ${event.status === "skipped" ? "opacity-60" : ""}`}>
       {editing ? (
         <div className="flex flex-col gap-2">
-          <input value={timeOfDay} onChange={(e) => setTimeOfDay(e.target.value)} placeholder="Time of day" className="rounded-md border border-black/15 px-2 py-1.5 text-sm" />
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" className="rounded-md border border-black/15 px-2 py-1.5 text-sm" />
+          <input value={timeOfDay} onChange={(e) => setTimeOfDay(e.target.value)} placeholder="Time of day" className="rounded-md border border-black/15 px-2.5 py-2.5 text-base" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" className="rounded-md border border-black/15 px-2.5 py-2.5 text-base" />
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Details"
             rows={2}
-            className="rounded-md border border-black/15 px-2 py-1.5 text-sm"
+            className="rounded-md border border-black/15 px-2.5 py-2.5 text-base"
           />
-          <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location" className="rounded-md border border-black/15 px-2 py-1.5 text-sm" />
+          <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location" className="rounded-md border border-black/15 px-2.5 py-2.5 text-base" />
           <div className="flex gap-2">
-            <button type="button" onClick={handleSaveEdit} disabled={saving} className="rounded-md bg-ink px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50">
+            <button type="button" onClick={handleSaveEdit} disabled={saving} className="rounded-md bg-ink px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">
               Save
             </button>
-            <button type="button" onClick={() => setEditing(false)} className="rounded-md px-3 py-1.5 text-sm text-ink-muted">
+            <button type="button" onClick={() => setEditing(false)} className="rounded-md px-4 py-2.5 text-sm text-ink-muted">
               Cancel
             </button>
           </div>
@@ -227,7 +227,7 @@ function EventRow({
               {event.description && <p className="mt-0.5 text-sm text-ink-muted">{event.description}</p>}
               {event.location && <p className="mt-0.5 text-xs text-ink-muted">📍 {event.location}</p>}
             </div>
-            <button type="button" onClick={() => onDelete(event.id)} aria-label="Delete" className="shrink-0 p-1 text-ink-muted hover:text-red-600">
+            <button type="button" onClick={() => onDelete(event.id)} aria-label="Delete" className="-mr-2 -mt-1 shrink-0 p-2.5 text-ink-muted hover:text-red-600">
               ✕
             </button>
           </div>
@@ -236,24 +236,24 @@ function EventRow({
             <button
               type="button"
               onClick={() => handleStatus("done")}
-              className={`rounded-md px-2.5 py-1 text-xs font-medium ${event.status === "done" ? "bg-green-600 text-white" : "bg-black/5 text-ink-muted hover:bg-black/10"}`}
+              className={`rounded-md px-3 py-2 text-xs font-medium ${event.status === "done" ? "bg-green-600 text-white" : "bg-black/5 text-ink-muted hover:bg-black/10"}`}
             >
               Done
             </button>
             <button
               type="button"
               onClick={() => handleStatus("skipped")}
-              className={`rounded-md px-2.5 py-1 text-xs font-medium ${event.status === "skipped" ? "bg-red-600 text-white" : "bg-black/5 text-ink-muted hover:bg-black/10"}`}
+              className={`rounded-md px-3 py-2 text-xs font-medium ${event.status === "skipped" ? "bg-red-600 text-white" : "bg-black/5 text-ink-muted hover:bg-black/10"}`}
             >
               Skipped
             </button>
-            <button type="button" onClick={() => setEditing(true)} className="rounded-md px-2.5 py-1 text-xs font-medium text-ink-muted hover:bg-black/5">
+            <button type="button" onClick={() => setEditing(true)} className="rounded-md px-3 py-2 text-xs font-medium text-ink-muted hover:bg-black/5">
               Edit
             </button>
             <select
               defaultValue=""
               onChange={(e) => handleReschedule(e.target.value)}
-              className="rounded-md border border-black/15 px-2 py-1 text-xs text-ink-muted"
+              className="rounded-md border border-black/15 px-2 py-2 text-xs text-ink-muted"
               aria-label="Reschedule to another day"
             >
               <option value="">Reschedule…</option>
@@ -302,16 +302,16 @@ function AddEventForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2 rounded-lg border border-black/10 bg-white px-4 py-3">
       <div className="flex gap-2">
-        <input value={timeOfDay} onChange={(e) => setTimeOfDay(e.target.value)} placeholder="Time" className="w-28 rounded-md border border-black/15 px-2 py-1.5 text-sm" />
-        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="What's the plan?" className="flex-1 rounded-md border border-black/15 px-2 py-1.5 text-sm" />
+        <input value={timeOfDay} onChange={(e) => setTimeOfDay(e.target.value)} placeholder="Time" className="w-24 rounded-md border border-black/15 px-2.5 py-2.5 text-base" />
+        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="What's the plan?" className="min-w-0 flex-1 rounded-md border border-black/15 px-2.5 py-2.5 text-base" />
       </div>
-      <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Details" rows={2} className="rounded-md border border-black/15 px-2 py-1.5 text-sm" />
-      <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location" className="rounded-md border border-black/15 px-2 py-1.5 text-sm" />
+      <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Details" rows={2} className="rounded-md border border-black/15 px-2.5 py-2.5 text-base" />
+      <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location" className="rounded-md border border-black/15 px-2.5 py-2.5 text-base" />
       <div className="flex gap-2">
-        <button type="submit" disabled={saving} className="rounded-md bg-ink px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50">
+        <button type="submit" disabled={saving} className="rounded-md bg-ink px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">
           Add
         </button>
-        <button type="button" onClick={onCancel} className="rounded-md px-3 py-1.5 text-sm text-ink-muted">
+        <button type="button" onClick={onCancel} className="rounded-md px-4 py-2.5 text-sm text-ink-muted">
           Cancel
         </button>
       </div>
