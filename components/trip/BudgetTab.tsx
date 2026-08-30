@@ -157,6 +157,19 @@ function BudgetRow({
     }
   }
 
+  /** One click for "it cost exactly what we planned" — no typing needed. */
+  async function handleAcceptBudget(): Promise<void> {
+    setSaving(true);
+    setError(null);
+    try {
+      await onUpdate(item.id, { actualAmount: item.estimatedUsd, actualCurrency: "USD" });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save — try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <div className="rounded-lg border border-black/10 bg-white px-4 py-3">
       <div className="flex items-start justify-between gap-3">
@@ -234,15 +247,21 @@ function BudgetRow({
           {error && <p className="w-full text-xs text-red-600">{error}</p>}
         </div>
       ) : (
-        <div className="mt-2 flex gap-3">
-          <button type="button" onClick={() => setLogging(true)} className="text-xs font-medium text-ink underline">
+        <div className="mt-2 flex flex-wrap items-center gap-3">
+          <button type="button" onClick={() => setLogging(true)} disabled={saving} className="text-xs font-medium text-ink underline disabled:opacity-50">
             {hasActual ? "Edit actual" : "Log actual"}
           </button>
+          {!hasActual && (
+            <button type="button" onClick={handleAcceptBudget} disabled={saving} className="text-xs font-medium text-ink underline disabled:opacity-50">
+              {saving ? "Saving…" : "Accept budget"}
+            </button>
+          )}
           {hasActual && (
-            <button type="button" onClick={handleClear} disabled={saving} className="text-xs text-ink-muted underline">
+            <button type="button" onClick={handleClear} disabled={saving} className="text-xs text-ink-muted underline disabled:opacity-50">
               Clear
             </button>
           )}
+          {error && <p className="w-full text-xs text-red-600">{error}</p>}
         </div>
       )}
     </div>

@@ -1,5 +1,6 @@
 import { desc } from "drizzle-orm";
 import { cookies } from "next/headers";
+import { DeleteInviteButton } from "@/components/host/DeleteInviteButton";
 import { HostLoginForm } from "@/components/host/HostLoginForm";
 import { experienceCopy } from "@/content/experience-copy";
 import { getDb } from "@/db/client";
@@ -54,14 +55,17 @@ export default async function HostPage() {
 
         return (
           <section key={invite.id} className="aura-panel-solid flex flex-col gap-3 px-6 py-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-start justify-between gap-3">
               <p className="text-xs tracking-wide text-ink-muted uppercase">{invite.publicId}</p>
-              <span
-                className="rounded-full px-3 py-1 text-xs font-semibold"
-                style={{ background: "var(--accent-soft)", color: "var(--accent-strong)" }}
-              >
-                {invite.status}
-              </span>
+              <div className="flex items-center gap-3">
+                <span
+                  className="rounded-full px-3 py-1 text-xs font-semibold"
+                  style={{ background: "var(--accent-soft)", color: "var(--accent-strong)" }}
+                >
+                  {invite.status}
+                </span>
+                <DeleteInviteButton publicId={invite.publicId} label={decrypted?.preferredName ?? invite.publicId} />
+              </div>
             </div>
 
             <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-ink">
