@@ -29,7 +29,12 @@ export default async function HostPage() {
 
   return (
     <main className="mx-auto flex min-h-[100svh] max-w-2xl flex-col gap-6 px-5 py-10">
-      <h1 className="font-display text-2xl text-ink">Host view</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="font-display text-2xl text-ink">Host view</h1>
+        <a href="/host/trip" className="text-sm font-medium text-accent-strong underline">
+          Trip tracker →
+        </a>
+      </div>
       {invites.length === 0 && <p className="text-ink-muted">No invites provisioned yet.</p>}
 
       {invites.map((invite) => {

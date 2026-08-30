@@ -14,7 +14,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "NODE_OPTIONS=--conditions=react-server tsx db/migrate.ts",
     "provision:invite": "NODE_OPTIONS=--conditions=react-server tsx scripts/provision-invite.ts",
-    "provision:host-secret": "NODE_OPTIONS=--conditions=react-server tsx scripts/provision-host-secret.ts"
+    "provision:host-secret": "NODE_OPTIONS=--conditions=react-server tsx scripts/provision-host-secret.ts",
+    "seed:trip": "NODE_OPTIONS=--conditions=react-server tsx scripts/seed-trip.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

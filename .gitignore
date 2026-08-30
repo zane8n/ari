@@ -42,3 +42,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# real trip content — this repo is public; real dates, accommodation, budget
+# figures and itinerary must never be committed (see content/arusha-trip.ts)
+content/arusha-trip.local.ts
+arusha_*_itinerary.md

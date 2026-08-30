@@ -9,7 +9,7 @@ import { experienceCopy } from "@/content/experience-copy";
  */
 describe("approved copy — exact wording", () => {
   it("arrival", () => {
-    expect(experienceCopy.arrival.title).toBe("Hey!! You found your gift.");
+    expect(experienceCopy.arrival.title).toBe("Hey!! You found your last gift.");
     expect(experienceCopy.arrival.action).toBe("Let's go!");
   });
 

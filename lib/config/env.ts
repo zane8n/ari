@@ -45,6 +45,16 @@ const envSchema = z
         "PUBLIC_SITE_ORIGIN must use https in production (http://localhost is fine for local dev).",
       ),
     RECIPIENT_DEFAULT_NAME: z.string().max(32).optional().default(""),
+
+    // Trip tracker (/host/trip) display values only — the day-by-day
+    // itinerary and budget line items themselves live exclusively in the
+    // database (seeded from a gitignored local content file), never in
+    // source, since this repo is public. These four are just short labels
+    // and two numbers, safe enough to default rather than fail closed.
+    TRIP_DESTINATION: z.string().max(80).optional().default("The trip"),
+    TRIP_HOME_BASE: z.string().max(80).optional().default(""),
+    TRIP_CASH_BUDGET_USD: z.coerce.number().finite().nonnegative().optional().default(0),
+    TRIP_RESERVE_BUDGET_USD: z.coerce.number().finite().nonnegative().optional().default(0),
   })
   .refine((env) => new Date(env.VACATION_END).getTime() > new Date(env.VACATION_START).getTime(), {
     message: "VACATION_END must be after VACATION_START.",

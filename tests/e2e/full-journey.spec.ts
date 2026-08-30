@@ -13,7 +13,7 @@ test.describe("full recipient journey", () => {
     const { token } = await provisionTestInvite();
 
     await page.goto(`/for/${token}`);
-    await expect(page.getByRole("heading", { name: /You found your gift/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /You found your.*gift/ })).toBeVisible();
     await page.getByRole("button", { name: "Let's go!" }).click();
 
     await page.getByLabel(/what should I call you/i).fill("Playwright Tester");

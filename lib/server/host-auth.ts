@@ -1,5 +1,6 @@
 import "server-only";
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { cookies } from "next/headers";
 import { getEnv } from "@/lib/config/env";
 
 export const HOST_SESSION_COOKIE_NAME = "birthday_host_session";
@@ -71,3 +72,9 @@ export function verifyHostSessionToken(token: string | undefined | null): boolea
 }
 
 export const HOST_SESSION_MAX_AGE_SECONDS = SESSION_TTL_MS / 1000;
+
+/** Shared guard for the trip-tracker API routes — same session cookie the /host page checks. */
+export async function hasValidHostSession(): Promise<boolean> {
+  const cookieStore = await cookies();
+  return verifyHostSessionToken(cookieStore.get(HOST_SESSION_COOKIE_NAME)?.value);
+}
