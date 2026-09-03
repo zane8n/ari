@@ -65,7 +65,7 @@ export function TripApp({
     return {
       estimated,
       spent,
-      remaining: meta.cashBudgetUsd - spent,
+      remaining: estimated - spent,
       reserveRemaining: meta.reserveBudgetUsd - reserveSpent,
     };
   }, [budgetItems, meta]);

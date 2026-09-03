@@ -61,7 +61,7 @@ export function InsightsTab({
         <StatTile
           label="Cash remaining"
           value={money(analysis.cashRemainingUsd)}
-          tone={analysis.cashRemainingUsd < 0 ? "critical" : analysis.cashRemainingUsd < analysis.cashBudgetUsd * 0.15 ? "warning" : "good"}
+          tone={analysis.cashRemainingUsd < 0 ? "critical" : analysis.cashRemainingUsd < analysis.totalEstimatedUsd * 0.15 ? "warning" : "good"}
         />
       </div>
 

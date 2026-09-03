@@ -167,8 +167,13 @@ export function analyzeTrip(
     totalActualLoggedUsd,
     loggedItemCount: loggedItems.length,
     totalItemCount: planned.length,
+    // Remaining tracks the live itemized plan (what's left to spend of what's actually
+    // budgeted line by line), not the separately configured cash figure — the two can
+    // drift apart as items are added or re-estimated during the trip.
     cashBudgetUsd: meta.cashBudgetUsd,
-    cashRemainingUsd: meta.cashBudgetUsd - totalActualLoggedUsd,
+    cashRemainingUsd: totalEstimatedUsd - totalActualLoggedUsd,
+    // Reserve is a fixed margin set aside outside normal spending, so it stays anchored
+    // to the configured figure and only moves when reserve-flagged items are spent.
     reserveBudgetUsd: meta.reserveBudgetUsd,
     reserveRemainingUsd: meta.reserveBudgetUsd - reserveSpent,
     budgetAdherencePct,

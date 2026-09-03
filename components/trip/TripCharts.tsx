@@ -133,12 +133,13 @@ export function CurrencyMixBars({ data }: { data: CurrencyMix[] }) {
   if (data.length === 0) return null;
   return (
     <ChartCard title="Currency mix" subtitle="What's actually been paid, by currency (USD-equivalent)">
-      <ResponsiveContainer width="100%" height={160}>
-        <BarChart data={data} layout="vertical" margin={{ top: 4, right: 24, left: 8, bottom: 0 }}>
-          <XAxis type="number" tick={{ fontSize: 10, fill: MUTED }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `$${v}`} />
-          <YAxis type="category" dataKey="currency" tick={{ fontSize: 12, fill: INK }} axisLine={false} tickLine={false} width={40} />
+      <ResponsiveContainer width="100%" height={220}>
+        <BarChart data={data} margin={{ top: 4, right: 8, left: -16, bottom: 0 }} barCategoryGap="35%">
+          <CartesianGrid strokeDasharray="3 3" stroke={GRID} vertical={false} />
+          <XAxis dataKey="currency" tick={{ fontSize: 12, fill: INK }} axisLine={{ stroke: GRID }} tickLine={false} />
+          <YAxis tick={{ fontSize: 10, fill: MUTED }} axisLine={false} tickLine={false} width={44} tickFormatter={(v: number) => `$${v}`} />
           <Tooltip contentStyle={tooltipStyle()} formatter={(value) => `$${toNum(value).toFixed(2)}`} />
-          <Bar dataKey="usdEquivalent" fill="#1baf7a" radius={[0, 3, 3, 0]} />
+          <Bar dataKey="usdEquivalent" fill="#1baf7a" radius={[3, 3, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </ChartCard>
