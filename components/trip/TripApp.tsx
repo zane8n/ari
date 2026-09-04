@@ -58,15 +58,16 @@ export function TripApp({
 
   const summary = useMemo(() => {
     const planned = budgetItems.filter((item) => !item.isReserve);
-    const reserve = budgetItems.filter((item) => item.isReserve);
     const spent = planned.reduce((total, item) => total + (item.actualUsd ?? 0), 0);
     const estimated = planned.reduce((total, item) => total + item.estimatedUsd, 0);
-    const reserveSpent = reserve.reduce((total, item) => total + (item.actualUsd ?? 0), 0);
+    // Only items that ran over their own estimate draw against the reserve — mirrors
+    // the overflow calc in lib/trip/analysis.ts.
+    const overflow = planned.reduce((total, item) => total + Math.max(0, (item.actualUsd ?? 0) - item.estimatedUsd), 0);
     return {
       estimated,
       spent,
       remaining: estimated - spent,
-      reserveRemaining: meta.reserveBudgetUsd - reserveSpent,
+      reserveRemaining: meta.reserveBudgetUsd - overflow,
     };
   }, [budgetItems, meta]);
 

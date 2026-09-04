@@ -70,12 +70,13 @@ export function analyzeTrip(
   meta: { cashBudgetUsd: number; reserveBudgetUsd: number },
 ): TripAnalysis {
   const planned = budgetItems.filter((item) => !item.isReserve);
-  const reserve = budgetItems.filter((item) => item.isReserve);
 
   const totalEstimatedUsd = planned.reduce((sum, item) => sum + item.estimatedUsd, 0);
   const loggedItems = planned.filter((item) => item.actualUsd !== null);
   const totalActualLoggedUsd = loggedItems.reduce((sum, item) => sum + (item.actualUsd ?? 0), 0);
-  const reserveSpent = reserve.reduce((sum, item) => sum + (item.actualUsd ?? 0), 0);
+  // Only items that ran over their own estimate draw against the reserve — running
+  // under elsewhere doesn't add slack back, so this is a sum of positive variances only.
+  const overflowUsd = loggedItems.reduce((sum, item) => sum + Math.max(0, (item.actualUsd ?? 0) - item.estimatedUsd), 0);
 
   // Adherence compares actual vs estimate only for the items actually logged so far —
   // not yet meaningful before anything has been logged.
@@ -172,10 +173,10 @@ export function analyzeTrip(
     // drift apart as items are added or re-estimated during the trip.
     cashBudgetUsd: meta.cashBudgetUsd,
     cashRemainingUsd: totalEstimatedUsd - totalActualLoggedUsd,
-    // Reserve is a fixed margin set aside outside normal spending, so it stays anchored
-    // to the configured figure and only moves when reserve-flagged items are spent.
+    // Remaining margin after absorbing cost overruns on the rest of the plan — see
+    // overflowUsd above.
     reserveBudgetUsd: meta.reserveBudgetUsd,
-    reserveRemainingUsd: meta.reserveBudgetUsd - reserveSpent,
+    reserveRemainingUsd: meta.reserveBudgetUsd - overflowUsd,
     budgetAdherencePct,
     itineraryCompletionPct,
     eventStatusCounts,

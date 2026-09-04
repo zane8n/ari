@@ -18,7 +18,7 @@ export function buildCoachSystemPrompt(params: {
 ## Current trip data snapshot (live, computed just now)
 
 Cash budget (configured): $${analysis.cashBudgetUsd} — total planned (estimated): $${analysis.totalEstimatedUsd.toFixed(2)} — remaining to spend of the plan: $${analysis.cashRemainingUsd.toFixed(2)}
-Reserve budget (separate margin, not normal spending money): $${analysis.reserveBudgetUsd} — remaining: $${analysis.reserveRemainingUsd.toFixed(2)}
+Reserve budget (a margin that absorbs cost overruns — items that ran over their own estimate, not net of savings elsewhere): $${analysis.reserveBudgetUsd} — remaining after overruns: $${analysis.reserveRemainingUsd.toFixed(2)}
 Logged so far: ${analysis.loggedItemCount}/${analysis.totalItemCount} budget items, totaling $${analysis.totalActualLoggedUsd.toFixed(2)}
 Budget adherence (of items logged): ${analysis.budgetAdherencePct !== null ? `${analysis.budgetAdherencePct.toFixed(0)}%` : "nothing logged yet"}
 Itinerary completion: ${analysis.itineraryCompletionPct.toFixed(0)}% (${analysis.eventStatusCounts.map((s) => `${s.count} ${s.label.toLowerCase()}`).join(", ")})
