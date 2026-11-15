@@ -30,6 +30,10 @@ const nextConfig: NextConfig = {
         headers: [{ key: "Cache-Control", value: "private, no-store" }],
       },
       {
+        source: "/letter/:path*",
+        headers: [{ key: "Cache-Control", value: "private, no-store" }],
+      },
+      {
         source: "/host/:path*",
         headers: [{ key: "Cache-Control", value: "private, no-store" }],
       },

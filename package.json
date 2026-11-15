@@ -15,7 +15,8 @@
     "db:migrate": "NODE_OPTIONS=--conditions=react-server tsx db/migrate.ts",
     "provision:invite": "NODE_OPTIONS=--conditions=react-server tsx scripts/provision-invite.ts",
     "provision:host-secret": "NODE_OPTIONS=--conditions=react-server tsx scripts/provision-host-secret.ts",
-    "seed:trip": "NODE_OPTIONS=--conditions=react-server tsx scripts/seed-trip.ts"
+    "seed:trip": "NODE_OPTIONS=--conditions=react-server tsx scripts/seed-trip.ts",
+    "provision:letter": "NODE_OPTIONS=--conditions=react-server tsx scripts/provision-letter.ts"
   },
   "dependencies": {
     "@ai-sdk/react": "^4.0.87",

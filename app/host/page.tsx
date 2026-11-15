@@ -6,6 +6,7 @@ import { experienceCopy } from "@/content/experience-copy";
 import { getDb } from "@/db/client";
 import { inviteSessions } from "@/db/schema";
 import { decryptPayload } from "@/lib/server/crypto";
+import { listLetterStatuses } from "@/lib/server/letters";
 import { HOST_SESSION_COOKIE_NAME, verifyHostSessionToken } from "@/lib/server/host-auth";
 import { buildSignaturePaths } from "@/lib/server/signatureSvg";
 import { getTheme } from "@/lib/theme/themes";
@@ -27,6 +28,9 @@ export default async function HostPage() {
 
   const db = getDb();
   const invites = await db.select().from(inviteSessions).orderBy(desc(inviteSessions.createdAt));
+  const letterStatuses = await listLetterStatuses();
+  const formatWhen = (value: Date | null) =>
+    value ? value.toLocaleString("en-GB", { timeZone: "Africa/Nairobi", dateStyle: "medium", timeStyle: "short" }) : "Not yet";
 
   return (
     <main className="mx-auto flex min-h-[100svh] max-w-2xl flex-col gap-6 px-5 py-10">
@@ -36,6 +40,20 @@ export default async function HostPage() {
           Trip tracker →
         </a>
       </div>
+      {letterStatuses.map((letter) => (
+        <section key={letter.id} className="aura-panel-solid flex flex-col gap-3 px-6 py-6">
+          <p className="text-xs tracking-wide text-ink-muted uppercase">Letter</p>
+          <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-ink">
+            <dt className="text-ink-muted">Unlocks</dt>
+            <dd>{formatWhen(letter.unlockAt)}</dd>
+            <dt className="text-ink-muted">Opened</dt>
+            <dd>{formatWhen(letter.openedAt)}</dd>
+            <dt className="text-ink-muted">Read to the end</dt>
+            <dd>{formatWhen(letter.finishedAt)}</dd>
+          </dl>
+        </section>
+      ))}
+
       {invites.length === 0 && <p className="text-ink-muted">No invites provisioned yet.</p>}
 
       {invites.map((invite) => {

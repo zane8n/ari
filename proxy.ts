@@ -29,7 +29,7 @@ function buildCsp(nonce: string): string {
   ].join("; ");
 }
 
-const PRIVATE_PATH_PREFIXES = ["/for/", "/host", "/api/"];
+const PRIVATE_PATH_PREFIXES = ["/for/", "/letter/", "/host", "/api/"];
 
 export function proxy(request: NextRequest): NextResponse {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");

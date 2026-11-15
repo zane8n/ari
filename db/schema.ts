@@ -112,3 +112,23 @@ export const itineraryEvents = pgTable(
 
 export type ItineraryEvent = typeof itineraryEvents.$inferSelect;
 export type NewItineraryEvent = typeof itineraryEvents.$inferInsert;
+
+/**
+ * Private, time-locked letters — one row per letter, reached through an
+ * unguessable `/letter/<token>` link. The body lives only here (this repo is
+ * public; see content/letter.ts), and is never sent to the browser before
+ * `unlockAt`.
+ */
+export const letters = pgTable("letters", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tokenHash: text("token_hash").notNull().unique(),
+  body: text("body").notNull(),
+  signature: text("signature"),
+  unlockAt: timestamp("unlock_at", { withTimezone: true }).notNull(),
+  openedAt: timestamp("opened_at", { withTimezone: true }),
+  finishedAt: timestamp("finished_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export type Letter = typeof letters.$inferSelect;
+export type NewLetter = typeof letters.$inferInsert;

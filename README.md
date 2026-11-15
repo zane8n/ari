@@ -161,3 +161,13 @@ scripts/               Admin provisioning (never web-exposed)
 tests/                 unit/, components/, e2e/
 docs/guideline.md      The developer guideline — the source of truth
 ```
+
+## Time-locked letter (`/letter/<token>`)
+
+A private letter, read a page at a time, that the server refuses to send before its unlock time.
+The text is never committed (this repo is public): copy `content/letter.example.ts` to
+`content/letter.local.ts` (gitignored), write the letter and its `unlockAt` there, then run
+`pnpm db:migrate` (once) and `pnpm provision:letter`. The script stores the letter in the database
+and prints the private link; each run creates a new letter with a new link. `/host` shows when it
+was opened and when it was read to the end.
+

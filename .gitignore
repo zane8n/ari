@@ -47,3 +47,6 @@ next-env.d.ts
 # figures and itinerary must never be committed (see content/arusha-trip.ts)
 content/arusha-trip.local.ts
 arusha_*_itinerary.md
+
+# the real letter — same rule as the trip content above (see content/letter.ts)
+content/letter.local.ts
