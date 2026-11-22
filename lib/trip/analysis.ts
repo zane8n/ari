@@ -5,14 +5,14 @@ import type { CheckinView, SerializedBudgetItem, SerializedExpense } from "./typ
 export const CATEGORY_ORDER: BudgetCategory[] = ["food", "transport", "activities", "shopping", "accommodation", "other"];
 
 /** The dataviz skill's validated 6-slot categorical palette, in fixed order — never reassigned per-render. */
-/** Fixed categorical palette tuned for the dark trip theme — never reassigned per render. */
+/** Fixed categorical palette — soft but legible on white, never reassigned per render. */
 export const CATEGORY_COLORS: Record<BudgetCategory, string> = {
-  food: "#d6b876",
-  transport: "#7fa7c9",
-  activities: "#8fc4a6",
-  shopping: "#d98c75",
-  accommodation: "#b59ad6",
-  other: "#c9c2b2",
+  food: "#e0628a",
+  transport: "#6d8fd6",
+  activities: "#3fa883",
+  shopping: "#e99a4a",
+  accommodation: "#9a7bd6",
+  other: "#a8919f",
 };
 
 export const CATEGORY_LABELS: Record<BudgetCategory, string> = {
@@ -27,9 +27,9 @@ export const CATEGORY_LABELS: Record<BudgetCategory, string> = {
 /** The dataviz skill's fixed status palette — reserved for state, never reused for a series. */
 /** Fixed status palette — reserved for state, never reused for a series. */
 export const STATUS_COLORS: Record<EventStatus, string> = {
-  done: "#9ccdab",
-  planned: "#6f685b",
-  skipped: "#e38c76",
+  done: "#3f9b6e",
+  planned: "#e3d6de",
+  skipped: "#e07a5f",
 };
 
 export type CategoryBreakdown = { category: BudgetCategory; label: string; estimatedUsd: number; actualUsd: number; color: string };

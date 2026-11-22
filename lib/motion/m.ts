@@ -9,6 +9,7 @@ export {
   MotionConfig,
   LazyMotion,
   domAnimation,
+  domMax,
   useReducedMotion,
   useMotionValue,
   useSpring,

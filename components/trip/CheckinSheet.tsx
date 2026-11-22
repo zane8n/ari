@@ -4,8 +4,9 @@ import { useMemo, useState } from "react";
 import type { EventStatus } from "@/db/schema";
 import { formatMoney } from "@/lib/currency/convert";
 import { formatLongDay } from "@/lib/trip/dates";
+import { AnimatePresence, m } from "@/lib/motion/m";
 import { useTrip } from "./TripContext";
-import { Sheet } from "./ui";
+import { ease, Sheet } from "./ui";
 
 const MOODS = ["Rough", "Meh", "Good", "Great", "Perfect"];
 const STEPS = ["The day", "The money", "Close it"] as const;
@@ -34,13 +35,13 @@ function CheckinBody({ day }: { day: string }) {
   const dayInfo = bundle.days.find((d) => d.date === day);
   const events = useMemo(() => bundle.events.filter((e) => e.day === day).sort((a, b) => a.sortOrder - b.sortOrder), [bundle.events, day]);
   const fixedLines = useMemo(
-    () => money.items.filter((m) => !m.item.isReserve && m.item.kind === "fixed" && m.item.day === day && m.item.status !== "dropped"),
+    () => money.items.filter((x) => !x.item.isReserve && x.item.kind === "fixed" && x.item.day === day && x.item.status !== "dropped"),
     [money.items, day],
   );
-  const runningLines = useMemo(() => money.items.filter((m) => !m.item.isReserve && m.item.kind === "running" && m.item.status === "open"), [money.items]);
+  const runningLines = useMemo(() => money.items.filter((x) => !x.item.isReserve && x.item.kind === "running" && x.item.status === "open"), [money.items]);
   const dayExpenses = bundle.expenses.filter((e) => e.day === day && e.fund === "pot");
   const daySpentUsd = dayExpenses.reduce((sum, e) => sum + e.amountUsd, 0);
-  const unsettled = fixedLines.filter((m) => m.item.status === "open").length;
+  const unsettled = fixedLines.filter((x) => x.item.status === "open").length;
 
   async function setStatus(eventId: string, status: EventStatus) {
     const event = bundle.events.find((e) => e.id === eventId);
@@ -94,23 +95,25 @@ function CheckinBody({ day }: { day: string }) {
       description={`${formatLongDay(day)}${dayInfo ? ` · ${dayInfo.label}` : ""}`}
       footer={footer}
     >
-      <ol className="mb-4 grid grid-cols-3 gap-1" aria-label="Check-in steps">
+      <ol className="mb-6 grid grid-cols-3 gap-2" aria-label="Check-in steps">
         {STEPS.map((label, i) => (
           <li key={label}>
             <button type="button" onClick={() => setStep(i)} className="w-full text-left" aria-current={i === step ? "step" : undefined}>
-              <span className={`block h-1 ${i <= step ? "bg-[var(--t-sea)]" : "bg-[var(--t-sunk)]"}`} />
-              <span className={`mt-1 block text-[11px] font-bold tracking-wide uppercase ${i === step ? "text-[var(--t-ink)]" : "text-[var(--t-muted)]"}`}>{label}</span>
+              <span className={`block h-1.5 rounded-full transition-colors duration-500 ${i <= step ? "bg-[var(--t-sea)]" : "bg-[var(--t-sunk)]"}`} />
+              <span className={`mt-2 block text-xs ${i === step ? "font-medium text-[var(--t-ink)]" : "text-[var(--t-muted)]"}`}>{label}</span>
             </button>
           </li>
         ))}
       </ol>
 
+      <AnimatePresence mode="wait" initial={false}>
+        <m.div key={step} initial={{ opacity: 0, x: 28 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -28 }} transition={{ duration: 0.3, ease }}>
       {step === 0 && (
         <div className="flex flex-col gap-2">
           <p className="text-sm text-[var(--t-muted)]">What actually happened today?</p>
           {events.length === 0 && <p className="text-sm">Nothing was planned — a free day.</p>}
           {events.map((event) => (
-            <div key={event.id} className={`flex items-center gap-3 px-3 py-2.5 ${event.isSurprise ? "trip-surprise" : "trip-card"}`}>
+            <div key={event.id} className={`flex items-center gap-3 px-3 py-2.5 ${event.isSurprise ? "trip-surprise" : "trip-soft"}`}>
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-bold text-[var(--t-muted)]">{event.timeOfDay}</p>
                 <p className="leading-snug font-semibold">{event.title}</p>
@@ -145,25 +148,25 @@ function CheckinBody({ day }: { day: string }) {
           {fixedLines.length > 0 && (
             <section className="flex flex-col gap-2">
               <p className="text-sm text-[var(--t-muted)]">Today&apos;s planned costs — one tap if it matched the plan.</p>
-              {fixedLines.map((m) => {
-                const paid = m.item.status === "paid";
-                const value = customAmount[m.item.id] ?? "";
+              {fixedLines.map((x) => {
+                const paid = x.item.status === "paid";
+                const value = customAmount[x.item.id] ?? "";
                 return (
-                  <div key={m.item.id} className="trip-card px-3 py-3">
+                  <div key={x.item.id} className="trip-soft px-4 py-4">
                     <div className="flex items-baseline justify-between gap-2">
-                      <p className="font-semibold">{m.item.label}</p>
-                      <p className="trip-num shrink-0 text-lg">{paid ? fmt(m.paidUsd) : fmt(m.item.estimatedUsd)}</p>
+                      <p className="font-semibold">{x.item.label}</p>
+                      <p className="trip-num shrink-0 text-lg">{paid ? fmt(x.paidUsd) : fmt(x.item.estimatedUsd)}</p>
                     </div>
                     {paid ? (
                       <p className="mt-1 text-xs font-semibold text-[var(--t-good)]">
-                        Settled{m.varianceUsd ? ` · ${m.varianceUsd > 0 ? "+" : "−"}${fmt(Math.abs(m.varianceUsd))} vs plan` : " · on plan"}
+                        Settled{x.varianceUsd ? ` · ${x.varianceUsd > 0 ? "+" : "−"}${fmt(Math.abs(x.varianceUsd))} vs plan` : " · on plan"}
                       </p>
                     ) : (
                       <div className="mt-2 flex flex-wrap items-center gap-2">
                         <button
                           type="button"
-                          disabled={busyId === m.item.id}
-                          onClick={() => settle(m.item.id, m.item.estimatedUsd, "USD")}
+                          disabled={busyId === x.item.id}
+                          onClick={() => settle(x.item.id, x.item.estimatedUsd, "USD")}
                           className="trip-btn trip-btn-primary !min-h-[40px]"
                         >
                           As planned
@@ -171,20 +174,20 @@ function CheckinBody({ day }: { day: string }) {
                         <input
                           inputMode="decimal"
                           value={value}
-                          onChange={(e) => setCustomAmount((s) => ({ ...s, [m.item.id]: e.target.value.replace(/[^\d.]/g, "") }))}
+                          onChange={(e) => setCustomAmount((s) => ({ ...s, [x.item.id]: e.target.value.replace(/[^\d.]/g, "") }))}
                           placeholder={bundle.trip.spendCurrency}
-                          aria-label={`Actual amount for ${m.item.label} in ${bundle.trip.spendCurrency}`}
+                          aria-label={`Actual amount for ${x.item.label} in ${bundle.trip.spendCurrency}`}
                           className="trip-input !min-h-[40px] w-28"
                         />
                         <button
                           type="button"
-                          disabled={!value || busyId === m.item.id}
-                          onClick={() => settle(m.item.id, Number.parseFloat(value))}
+                          disabled={!value || busyId === x.item.id}
+                          onClick={() => settle(x.item.id, Number.parseFloat(value))}
                           className="trip-btn trip-btn-ghost !min-h-[40px]"
                         >
                           Save
                         </button>
-                        <button type="button" onClick={() => updateItem(m.item.id, { status: "dropped" })} className="trip-btn trip-btn-quiet !min-h-[40px] text-xs">
+                        <button type="button" onClick={() => updateItem(x.item.id, { status: "dropped" })} className="trip-btn trip-btn-quiet !min-h-[40px] text-xs">
                           Didn&apos;t happen
                         </button>
                       </div>
@@ -198,32 +201,32 @@ function CheckinBody({ day }: { day: string }) {
           {runningLines.length > 0 && (
             <section className="flex flex-col gap-2">
               <p className="text-sm text-[var(--t-muted)]">Small stuff today — tuk-tuks, snacks, groceries.</p>
-              {runningLines.map((m) => {
-                const value = customAmount[m.item.id] ?? "";
-                const today = dayExpenses.filter((e) => e.budgetItemId === m.item.id).reduce((s, e) => s + e.amountUsd, 0);
+              {runningLines.map((x) => {
+                const value = customAmount[x.item.id] ?? "";
+                const today = dayExpenses.filter((e) => e.budgetItemId === x.item.id).reduce((s, e) => s + e.amountUsd, 0);
                 return (
-                  <div key={m.item.id} className="flex items-center gap-2">
+                  <div key={x.item.id} className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold">{m.item.label}</p>
+                      <p className="truncate text-sm font-semibold">{x.item.label}</p>
                       <p className="text-[11px] text-[var(--t-muted)]">
                         {today > 0 ? `${fmt(today)} today · ` : ""}
-                        {fmt(m.stillExpectedUsd)} left
+                        {fmt(x.stillExpectedUsd)} left
                       </p>
                     </div>
                     <input
                       inputMode="decimal"
                       value={value}
-                      onChange={(e) => setCustomAmount((s) => ({ ...s, [m.item.id]: e.target.value.replace(/[^\d.]/g, "") }))}
+                      onChange={(e) => setCustomAmount((s) => ({ ...s, [x.item.id]: e.target.value.replace(/[^\d.]/g, "") }))}
                       placeholder={bundle.trip.spendCurrency}
-                      aria-label={`Add to ${m.item.label} in ${bundle.trip.spendCurrency}`}
+                      aria-label={`Add to ${x.item.label} in ${bundle.trip.spendCurrency}`}
                       className="trip-input !min-h-[40px] w-24"
                     />
                     <button
                       type="button"
-                      disabled={!value || busyId === m.item.id}
+                      disabled={!value || busyId === x.item.id}
                       onClick={async () => {
-                        await settle(m.item.id, Number.parseFloat(value));
-                        setCustomAmount((s) => ({ ...s, [m.item.id]: "" }));
+                        await settle(x.item.id, Number.parseFloat(value));
+                        setCustomAmount((s) => ({ ...s, [x.item.id]: "" }));
                       }}
                       className="trip-btn trip-btn-ghost !min-h-[40px] !px-3"
                     >
@@ -235,7 +238,7 @@ function CheckinBody({ day }: { day: string }) {
             </section>
           )}
 
-          <button type="button" onClick={() => openLog({ day })} className="trip-btn trip-btn-ghost w-full border-dashed">
+          <button type="button" onClick={() => openLog({ day })} className="trip-btn trip-btn-ghost w-full">
             + Something unplanned
           </button>
 
@@ -258,16 +261,16 @@ function CheckinBody({ day }: { day: string }) {
       {step === 2 && (
         <div className="flex flex-col gap-5">
           <div className="grid grid-cols-2 gap-3">
-            <div className="trip-card px-3 py-3">
+            <div className="trip-card px-4 py-4 text-center">
               <p className="trip-eyebrow">Spent this day</p>
               <p className="trip-num mt-1 text-2xl">{fmt(daySpentUsd)}</p>
             </div>
-            <div className="trip-card px-3 py-3">
-              <p className="trip-eyebrow">Left in the pot</p>
+            <div className="trip-card px-4 py-4 text-center">
+              <p className="trip-eyebrow">Left in our pot</p>
               <p className="trip-num mt-1 text-2xl">{fmt(money.leftUsd)}</p>
             </div>
           </div>
-          <p className={`px-3 py-2 text-sm ${money.headroomUsd >= 0 ? "bg-[var(--t-sea-soft)] text-[var(--t-sea-strong)]" : "bg-[var(--t-coral-soft)] text-[var(--t-coral)]"}`}>
+          <p className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${money.headroomUsd >= 0 ? "bg-[var(--t-sea-soft)] text-[var(--t-sea-strong)]" : "bg-[var(--t-coral-soft)] text-[var(--t-coral)]"}`}>
             {money.headroomUsd >= 0
               ? `On track. The rest of the plan fits, with ${fmt(money.extrasPerDayUsd)} a day free for extras.`
               : `The plan now runs ${fmt(-money.headroomUsd)} over the pot. The Money tab has the cut list, in your agreed order.`}
@@ -277,7 +280,7 @@ function CheckinBody({ day }: { day: string }) {
             <legend className="trip-eyebrow mb-2">How was it?</legend>
             <div className="grid grid-cols-5 gap-1">
               {MOODS.map((label, i) => (
-                <button key={label} type="button" aria-pressed={mood === i + 1} onClick={() => setMood(mood === i + 1 ? null : i + 1)} className="trip-chip !min-h-[44px] justify-center !px-1 !text-xs">
+                <button key={label} type="button" aria-pressed={mood === i + 1} onClick={() => setMood(mood === i + 1 ? null : i + 1)} className="trip-chip !min-h-[44px] justify-center !px-1 !text-[13px]">
                   {label}
                 </button>
               ))}
@@ -294,6 +297,8 @@ function CheckinBody({ day }: { day: string }) {
           )}
         </div>
       )}
+        </m.div>
+      </AnimatePresence>
     </Sheet>
   );
 }
