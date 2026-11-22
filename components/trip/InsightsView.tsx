@@ -5,15 +5,7 @@ import { analyzeTrip } from "@/lib/trip/analysis";
 import { CoachChat } from "./CoachChat";
 import { CategoryDonut, CumulativeSpendChart, CurrencyMixBars, DaySpendBars, StatusDonut, VarianceList } from "./TripCharts";
 import { useTrip } from "./TripContext";
-
-function Stat({ label, value, tone }: { label: string; value: string; tone?: "good" | "warn" }) {
-  return (
-    <div className="trip-card px-3 py-3">
-      <p className="trip-eyebrow">{label}</p>
-      <p className={`trip-num mt-1 text-2xl leading-none ${tone === "good" ? "text-[var(--t-good)]" : tone === "warn" ? "text-[var(--t-coral)]" : ""}`}>{value}</p>
-    </div>
-  );
-}
+import { CountUp, Reveal, Rise, Stat } from "./ui";
 
 export function InsightsView() {
   const { bundle, today, fmt, api } = useTrip();
@@ -22,23 +14,27 @@ export function InsightsView() {
   const tone = score >= 75 ? "good" : score >= 50 ? undefined : "warn";
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="trip-card px-5 py-5 text-center">
-        <p className="trip-eyebrow">Trip health score</p>
-        <p className={`trip-num mt-1 text-6xl leading-none ${tone === "good" ? "text-[var(--t-good)]" : tone === "warn" ? "text-[var(--t-coral)]" : ""}`}>
-          {score}
-          <span className="text-2xl text-[var(--t-muted)]">/100</span>
+    <div className="flex flex-col gap-6 pt-4">
+      <Rise className="flex flex-col items-center gap-3 text-center">
+        <p className="trip-eyebrow">Trip health</p>
+        <p className={`trip-num text-[88px] leading-none ${tone === "good" ? "text-[var(--t-good)]" : tone === "warn" ? "text-[var(--t-coral)]" : "text-[var(--t-sea)]"}`}>
+          <CountUp value={score} format={(v) => String(Math.round(v))} />
         </p>
-        <p className="mt-2 text-xs text-[var(--t-muted)]">Budget fit, follow-through and the check-in habit, blended. An entirely made-up metric, deployed with total confidence.</p>
-      </div>
+        <p className="max-w-xs text-sm leading-relaxed text-[var(--t-muted)]">Budget, follow-through and our evening check-ins, blended into one entirely made-up number.</p>
+      </Rise>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat label="Check-in streak" value={`${analysis.checkinStreak} ${analysis.checkinStreak === 1 ? "day" : "days"}`} tone={analysis.checkinStreak >= 2 ? "good" : undefined} />
-        <Stat label="Payments logged" value={String(analysis.loggedExpenseCount)} />
+      <Rise delay={0.08} className="trip-card grid grid-cols-3 gap-2 px-4 py-6">
+        <Stat label="Check-in streak" value={String(analysis.checkinStreak)} tone={analysis.checkinStreak >= 2 ? "good" : undefined} />
+        <Stat label="Payments" value={String(analysis.loggedExpenseCount)} />
         <Stat label="Plan done" value={`${analysis.itineraryCompletionPct.toFixed(0)}%`} />
-        <Stat label="Forecast vs pot" value={`${analysis.money.headroomUsd >= 0 ? "−" : "+"}${fmt(Math.abs(analysis.money.headroomUsd))}`} tone={analysis.money.headroomUsd >= 0 ? "good" : "warn"} />
-      </div>
+      </Rise>
 
+      <Rise delay={0.14}>
+        <CoachChat api={api.coachUrl} />
+      </Rise>
+
+      <Reveal label="Charts" className="trip-soft px-5">
+        <div className="flex flex-col gap-4 pb-4">
       <CumulativeSpendChart data={analysis.cumulative} money={fmt} />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <CategoryDonut data={analysis.categoryBreakdown} money={fmt} />
@@ -49,7 +45,8 @@ export function InsightsView() {
         <VarianceList variances={analysis.variances} money={fmt} />
         <CurrencyMixBars data={analysis.currencyMix} />
       </div>
-      <CoachChat api={api.coachUrl} />
+        </div>
+      </Reveal>
     </div>
   );
 }

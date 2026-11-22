@@ -5,6 +5,7 @@ import { TripApp, type TripTab } from "@/components/trip/TripApp";
 import { hasValidHostSession } from "@/lib/server/host-auth";
 import { findTripBySlug, loadTripBundle } from "@/lib/server/trip";
 import { getTripAccess } from "@/lib/server/tripAccess";
+import { resolveDeviceTheme } from "@/lib/server/tripTheme";
 
 export const dynamic = "force-dynamic";
 
@@ -21,11 +22,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: "Trip",
     manifest: `/host/trip/${encodeURIComponent(slug)}/manifest.webmanifest`,
-    appleWebApp: { capable: true, title: "Trip", statusBarStyle: "black-translucent" },
+    appleWebApp: { capable: true, title: "Trip", statusBarStyle: "default" },
   };
 }
 
-export const viewport: Viewport = { themeColor: "#0c0b09", colorScheme: "dark" };
+export const viewport: Viewport = { themeColor: "#fbf2f8", colorScheme: "light" };
 
 export default async function TripPage({ params, searchParams }: Props) {
   const { slug } = await params;
@@ -47,5 +48,6 @@ export default async function TripPage({ params, searchParams }: Props) {
   const tab = TABS.find((t) => t === query.tab);
   const checkin = query.checkin && /^\d{4}-\d{2}-\d{2}$/.test(query.checkin) ? query.checkin : undefined;
 
-  return <TripApp initial={await loadTripBundle(trip)} access={access} entry={{ tab, log: query.log === "1", checkin }} />;
+  const [bundle, theme] = await Promise.all([loadTripBundle(trip), resolveDeviceTheme(access)]);
+  return <TripApp initial={bundle} access={access} themeId={theme.themeId} entry={{ tab, log: query.log === "1", checkin }} />;
 }

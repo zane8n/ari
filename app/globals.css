@@ -699,490 +699,547 @@ h3 {
 }
 
 /*
- * Trip tracker — "obsidian & champagne". Scoped to .trip so it never leaks
- * into the invitation experience. A warm near-black, ivory type, champagne
- * gold reserved for action and fine detail, muted coral strictly for
- * warnings. Square geometry and hairlines, numbers set in the display serif.
+ * Trip tracker — "petal". Each person wears one of the invitation's twelve palettes (lib/trip/theme.ts). Scoped to .trip so it never leaks into
+ * the invitation experience. Cheerful and soft in colour (cream, blush,
+ * rose, a little peach and lavender); the premium feel comes from space,
+ * hierarchy, soft depth and motion rather than from darkness or gold.
+ * Layered as components so Tailwind utilities can still override per use.
  */
-/* Layered as components so Tailwind utilities (w-28, min-h-…) can still override per use. */
 @layer components {
-.trip {
-  --t-canvas: #0c0b09;
-  --t-surface: #15130f;
-  --t-raised: #1c1a15;
-  --t-sunk: #22201a;
-  --t-ink: #f2ece0;
-  --t-muted: #a69e8e;
-  --t-line: rgb(226 205 160 / 0.11);
-  --t-line-strong: rgb(226 205 160 / 0.24);
-  --t-sea: #d6b876;
-  --t-sea-strong: #e8d3a0;
-  --t-sea-soft: rgb(214 184 118 / 0.12);
-  --t-on-accent: #17130a;
-  --t-coral: #e38c76;
-  --t-coral-soft: rgb(227 140 118 / 0.13);
-  --t-sun: #e3b35a;
-  --t-sun-soft: rgb(227 179 90 / 0.13);
-  --t-good: #9ccdab;
-  --t-good-soft: rgb(156 205 171 / 0.12);
-  --t-gilt: #c9a45c;
-  --t-nav-h: 68px;
+  .trip {
+    /* Neutral base; the palette tokens below are overridden per person by lib/trip/theme.ts. */
+    --t-canvas: #fbf2f8;
+    --t-accent: #ff6fa0;
+    --t-wash: #fbd4e3;
+    --t-glow: rgb(255 111 160 / 0.26);
+    --t-surface: #ffffff;
+    --t-raised: #fffaf7;
+    --t-sunk: #f5ece6;
+    --t-ink: #2b1830;
+    --t-muted: #74607a;
+    --t-line: rgb(46 35 48 / 0.07);
+    --t-line-strong: rgb(46 35 48 / 0.14);
+    --t-sea: #c4457a;
+    --t-sea-strong: #a33a68;
+    --t-sea-soft: #fbe6ef;
+    --t-on-accent: #fbf2f8;
+    --t-coral: #b8482a;
+    --t-coral-soft: #fdebe4;
+    --t-sun: #a8701c;
+    --t-sun-soft: #fdf1dc;
+    --t-good: #2f8a5f;
+    --t-good-soft: #e3f4ea;
+    --t-gilt: #e9a17a;
+    --t-lavender: #efe8fb;
+    --t-peach: #ffeadd;
+    --t-shadow-sm: 0 1px 2px rgb(46 35 48 / 0.05);
+    --t-shadow: 0 1px 2px rgb(43 24 48 / 0.04), 0 12px 32px -14px rgb(90 40 90 / 0.2);
+    --t-shadow-lg: 0 2px 6px rgb(43 24 48 / 0.05), 0 24px 60px -20px rgb(90 40 90 / 0.28);
+    --t-r: 26px;
+    --t-r-sm: 18px;
+    --t-nav-h: 64px;
 
-  min-height: 100svh;
-  background: var(--t-canvas);
-  color: var(--t-ink);
-  color-scheme: dark;
-  font-family: var(--font-ui), var(--font-body), system-ui, sans-serif;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.01em;
-  -webkit-font-smoothing: antialiased;
-}
+    min-height: 100svh;
+    background: var(--t-canvas);
+    color: var(--t-ink);
+    color-scheme: light;
+    font-family: var(--font-ui), var(--font-body), system-ui, sans-serif;
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+  }
 
-/* A faint champagne light falling from the top, and fine grain — depth without decoration. */
-.trip-luxe {
-  background:
-    radial-gradient(120% 60% at 50% -10%, rgb(214 184 118 / 0.09), transparent 60%),
-    radial-gradient(80% 50% at 100% 100%, rgb(214 184 118 / 0.04), transparent 70%),
-    var(--t-canvas);
-  background-attachment: fixed;
-}
+  /* A soft sunset wash at the top of the page — warmth without clutter. */
+  .trip-luxe {
+    background:
+      radial-gradient(75% 42% at 0% 0%, color-mix(in srgb, var(--t-wash) 85%, transparent), transparent 70%),
+      radial-gradient(60% 35% at 100% 0%, rgb(255 230 212 / 0.75), transparent 70%),
+      radial-gradient(55% 30% at 85% 100%, color-mix(in srgb, var(--t-sea-soft) 90%, transparent), transparent 70%),
+      var(--t-canvas);
+    background-attachment: fixed;
+  }
 
-.trip h1,
-.trip h2,
-.trip h3 {
-  color: var(--t-ink);
-  letter-spacing: -0.005em;
-}
+  .trip h1,
+  .trip h2,
+  .trip h3 {
+    color: var(--t-ink);
+  }
 
-.trip-num {
-  font-family: var(--font-display), Georgia, serif;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  font-variant-numeric: lining-nums tabular-nums;
-}
+  .trip-num {
+    font-family: var(--font-display), Georgia, serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
 
-.trip-eyebrow {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: var(--t-muted);
-}
+  .trip-eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--t-muted);
+  }
 
-.trip-rule {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--t-gilt), transparent);
-}
+  .trip-rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--t-gilt), transparent);
+  }
 
-.trip-card {
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.025), transparent 40%), var(--t-surface);
-  border: 1px solid var(--t-line);
-}
+  .trip-card {
+    background: var(--t-surface);
+    border-radius: var(--t-r);
+    box-shadow: var(--t-shadow);
+  }
 
-/* The members'-card treatment — passes, the import drop zone. Double gold hairline. */
-.trip-pass-card {
-  position: relative;
-  background:
-    radial-gradient(100% 80% at 50% 0%, rgb(214 184 118 / 0.1), transparent 70%),
-    var(--t-surface);
-  border: 1px solid rgb(214 184 118 / 0.45);
-  box-shadow:
-    inset 0 0 0 5px var(--t-surface),
-    inset 0 0 0 6px rgb(214 184 118 / 0.22),
-    0 30px 80px -40px rgb(214 184 118 / 0.35);
-}
+  .trip-soft {
+    background: rgb(255 255 255 / 0.6);
+    border-radius: var(--t-r-sm);
+    border: 1px solid var(--t-line);
+  }
 
-.trip-header {
-  background: rgb(12 11 9 / 0.82);
-  backdrop-filter: blur(18px) saturate(1.2);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
-  border-bottom: 1px solid var(--t-line);
-}
+  /* The hero treatment — passes, check-in, the "next up" card. */
+  .trip-pass-card {
+    background:
+      radial-gradient(90% 70% at 0% 0%, var(--t-wash), transparent 70%),
+      radial-gradient(80% 70% at 100% 100%, rgb(255 232 214 / 0.9), transparent 70%),
+      var(--t-surface);
+    border-radius: 30px;
+    box-shadow: var(--t-shadow-lg);
+  }
 
-.trip-monogram {
-  display: inline-flex;
-  height: 40px;
-  width: 40px;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 22px;
-  font-weight: 500;
-  color: var(--t-sea);
-  border: 1px solid rgb(214 184 118 / 0.5);
-  box-shadow: inset 0 0 0 3px var(--t-canvas), inset 0 0 0 4px rgb(214 184 118 / 0.2);
-  transition: background-color 200ms ease;
-}
+  .trip-header {
+    background: color-mix(in srgb, var(--t-canvas) 80%, transparent);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  }
 
-.trip-monogram:hover {
-  background: var(--t-sea-soft);
-}
+  .trip-monogram {
+    display: inline-flex;
+    height: 42px;
+    width: 42px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    font-family: var(--font-display), Georgia, serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--t-sea-strong);
+    background: linear-gradient(135deg, var(--t-wash), #ffe8d8);
+    box-shadow: var(--t-shadow-sm), inset 0 0 0 1px rgb(255 255 255 / 0.8);
+    transition: transform 160ms ease;
+  }
 
-.trip-seg {
-  display: flex;
-  border: 1px solid var(--t-line-strong);
-}
+  .trip-monogram:active {
+    transform: scale(0.94);
+  }
 
-.trip-seg button {
-  min-height: 34px;
-  min-width: 46px;
-  padding: 0 8px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  color: var(--t-muted);
-}
+  .trip-seg {
+    position: relative;
+    display: inline-flex;
+    padding: 4px;
+    gap: 2px;
+    border-radius: 999px;
+    background: var(--t-sunk);
+  }
 
-.trip-seg button[aria-pressed="true"] {
-  background: var(--t-sea);
-  color: var(--t-on-accent);
-}
+  .trip-seg button {
+    position: relative;
+    z-index: 1;
+    min-height: 36px;
+    min-width: 56px;
+    padding: 0 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--t-muted);
+    transition: color 160ms ease;
+  }
 
-.trip-btn {
-  display: inline-flex;
-  min-height: 46px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 0 18px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  border: 1px solid transparent;
-  transition:
-    background-color 180ms ease,
-    border-color 180ms ease,
-    color 180ms ease,
-    transform 120ms ease;
-}
+  .trip-seg button[aria-pressed="true"],
+  .trip-seg button[aria-selected="true"] {
+    color: var(--t-ink);
+  }
 
-.trip-btn:active {
-  transform: scale(0.985);
-}
+  .trip-seg-pill {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 999px;
+    background: var(--t-surface);
+    box-shadow: var(--t-shadow-sm), 0 4px 12px -6px var(--t-glow);
+  }
 
-.trip-btn:disabled {
-  opacity: 0.4;
-}
+  .trip-btn {
+    display: inline-flex;
+    min-height: 50px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 22px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease,
+      box-shadow 180ms ease,
+      transform 140ms ease;
+  }
 
-.trip-btn-primary {
-  background: linear-gradient(180deg, #e2c88c, #c9a45c);
-  color: var(--t-on-accent);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25);
-}
+  .trip-btn:active {
+    transform: scale(0.97);
+  }
 
-.trip-btn-primary:hover {
-  background: linear-gradient(180deg, #ecd6a2, #d4b06a);
-}
+  .trip-btn:disabled {
+    opacity: 0.45;
+  }
 
-.trip-btn-ink {
-  background: var(--t-ink);
-  color: var(--t-canvas);
-}
+  .trip-btn-primary {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--t-sea) 82%, white), var(--t-sea));
+    color: var(--t-on-accent);
+    box-shadow: 0 8px 20px -8px color-mix(in srgb, var(--t-sea) 70%, transparent);
+  }
 
-.trip-btn-ghost {
-  background: transparent;
-  color: var(--t-ink);
-  border-color: var(--t-line-strong);
-}
+  .trip-btn-primary:hover {
+    box-shadow: 0 10px 26px -8px color-mix(in srgb, var(--t-sea) 80%, transparent);
+  }
 
-.trip-btn-ghost:hover {
-  border-color: var(--t-sea);
-  color: var(--t-sea-strong);
-}
+  .trip-btn-ink {
+    background: var(--t-ink);
+    color: #fff;
+  }
 
-.trip-btn-quiet {
-  background: transparent;
-  color: var(--t-muted);
-  padding: 0 10px;
-  letter-spacing: 0.12em;
-}
+  .trip-btn-ghost {
+    background: var(--t-surface);
+    color: var(--t-ink);
+    border-color: var(--t-line-strong);
+  }
 
-.trip-btn-quiet:hover {
-  color: var(--t-ink);
-}
+  .trip-btn-ghost:hover {
+    border-color: var(--t-sea);
+    color: var(--t-sea-strong);
+  }
 
-/* Status-filled buttons (Done / Skip) */
-.trip-btn-good {
-  background: var(--t-good);
-  color: var(--t-on-accent);
-}
+  .trip-btn-quiet {
+    background: transparent;
+    color: var(--t-muted);
+    padding: 0 12px;
+  }
 
-.trip-btn-warn {
-  background: var(--t-coral);
-  color: var(--t-on-accent);
-}
+  .trip-btn-quiet:hover {
+    color: var(--t-ink);
+  }
 
-.trip-chip {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  gap: 6px;
-  padding: 0 13px;
-  font-size: 13px;
-  font-weight: 400;
-  background: var(--t-surface);
-  border: 1px solid var(--t-line-strong);
-  color: var(--t-ink);
-  text-align: left;
-  transition:
-    border-color 160ms ease,
-    background-color 160ms ease;
-}
+  .trip-btn-good {
+    background: var(--t-good);
+    color: #fff;
+  }
 
-.trip-chip:hover {
-  border-color: rgb(214 184 118 / 0.6);
-}
+  .trip-btn-warn {
+    background: var(--t-coral);
+    color: #fff;
+  }
 
-.trip-chip[aria-pressed="true"] {
-  background: var(--t-sea);
-  border-color: var(--t-sea);
-  color: var(--t-on-accent);
-  font-weight: 500;
-}
-
-.trip-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 8px;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  background: var(--t-sunk);
-  color: var(--t-muted);
-  border: 1px solid var(--t-line);
-}
-
-.trip-input {
-  min-height: 48px;
-  width: 100%;
-  padding: 0 14px;
-  font-size: 16px;
-  background: var(--t-raised);
-  border: 1px solid var(--t-line-strong);
-  color: var(--t-ink);
-  outline: none;
-  transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease;
-}
-
-.trip-input::placeholder {
-  color: rgb(166 158 142 / 0.6);
-}
-
-.trip-input:focus {
-  border-color: var(--t-sea);
-  box-shadow: 0 0 0 3px rgb(214 184 118 / 0.14);
-}
-
-textarea.trip-input {
-  padding-top: 12px;
-  padding-bottom: 12px;
-}
-
-.trip select.trip-input {
-  appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, var(--t-muted) 50%), linear-gradient(135deg, var(--t-muted) 50%, transparent 50%);
-  background-position:
-    calc(100% - 18px) 50%,
-    calc(100% - 13px) 50%;
-  background-size: 5px 5px;
-  background-repeat: no-repeat;
-  padding-right: 32px;
-}
-
-.trip :focus-visible {
-  outline: 1px solid var(--t-sea);
-  outline-offset: 3px;
-}
-
-/* Bottom navigation — thumb-reach, safe-area aware. */
-.trip-nav {
-  position: fixed;
-  inset: auto 0 0 0;
-  z-index: 40;
-  background: rgb(12 11 9 / 0.88);
-  backdrop-filter: blur(18px) saturate(1.2);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
-  border-top: 1px solid var(--t-line);
-  padding-bottom: var(--safe-b);
-}
-
-.trip-nav button[aria-current="page"] {
-  color: var(--t-sea);
-}
-
-.trip-nav button[aria-current="page"]::before {
-  content: "";
-  position: absolute;
-  top: -1px;
-  left: 32%;
-  right: 32%;
-  height: 1px;
-  background: var(--t-sea);
-  box-shadow: 0 0 12px rgb(214 184 118 / 0.8);
-}
-
-.trip-fab {
-  background: linear-gradient(180deg, #e2c88c, #b8934c);
-  color: var(--t-on-accent);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.3),
-    0 0 0 4px var(--t-canvas),
-    0 0 0 5px rgb(214 184 118 / 0.35),
-    0 14px 30px -10px rgb(214 184 118 / 0.55);
-}
-
-/* Bottom sheet */
-.trip-sheet-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  background: rgb(5 4 3 / 0.66);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  animation: trip-fade 180ms ease-out both;
-}
-
-.trip-sheet {
-  position: fixed;
-  inset: auto 0 0 0;
-  z-index: 51;
-  margin: 0 auto;
-  display: flex;
-  max-height: 92svh;
-  max-width: 560px;
-  flex-direction: column;
-  background:
-    radial-gradient(100% 40% at 50% 0%, rgb(214 184 118 / 0.08), transparent 70%),
-    var(--t-canvas);
-  color: var(--t-ink);
-  border-top: 1px solid rgb(214 184 118 / 0.55);
-  box-shadow: 0 -30px 80px -30px rgb(0 0 0 / 0.8);
-  padding-bottom: var(--safe-b);
-  animation: trip-rise 260ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
-}
-
-@media (min-width: 640px) {
-  .trip-sheet {
-    inset: auto 0 24px 0;
+  .trip-chip {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    gap: 6px;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-size: 14px;
+    background: var(--t-surface);
     border: 1px solid var(--t-line-strong);
-    border-top-color: rgb(214 184 118 / 0.55);
+    color: var(--t-ink);
+    text-align: left;
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease,
+      color 160ms ease,
+      transform 140ms ease;
   }
-}
 
-.trip-sheet-footer {
-  background: var(--t-surface);
-  border-top: 1px solid var(--t-line);
-}
-
-@keyframes trip-fade {
-  from {
-    opacity: 0;
+  .trip-chip:active {
+    transform: scale(0.97);
   }
-}
 
-@keyframes trip-rise {
-  from {
-    transform: translateY(28px);
-    opacity: 0;
+  .trip-chip[aria-pressed="true"] {
+    background: var(--t-sea-soft);
+    border-color: color-mix(in srgb, var(--t-sea) 45%, transparent);
+    color: var(--t-sea-strong);
+    font-weight: 500;
   }
-}
 
-/* Pot bar: spent · still expected · free (or over). */
-.trip-bar {
-  display: flex;
-  height: 6px;
-  width: 100%;
-  overflow: hidden;
-  background: var(--t-sunk);
-}
+  .trip-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    background: rgb(255 255 255 / 0.75);
+    color: var(--t-muted);
+    box-shadow: inset 0 0 0 1px var(--t-line);
+  }
 
-.trip-bar > span {
-  height: 100%;
-}
+  .trip-input {
+    min-height: 50px;
+    width: 100%;
+    padding: 0 16px;
+    border-radius: 16px;
+    font-size: 16px;
+    background: var(--t-surface);
+    border: 1px solid var(--t-line-strong);
+    color: var(--t-ink);
+    outline: none;
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease;
+  }
 
-.trip-hatch {
-  background-image: repeating-linear-gradient(-45deg, rgb(214 184 118 / 0.85) 0 2px, rgb(214 184 118 / 0.18) 2px 5px);
-}
+  .trip-input::placeholder {
+    color: rgb(116 96 122 / 0.6);
+  }
 
-.trip-check {
-  display: inline-flex;
-  height: 30px;
-  width: 30px;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--t-line-strong);
-  border-radius: 999px;
-  background: var(--t-canvas);
-  color: transparent;
-  transition:
-    background-color 200ms ease,
-    border-color 200ms ease;
-}
+  .trip-input:focus {
+    border-color: var(--t-sea);
+    box-shadow: 0 0 0 4px var(--t-glow);
+  }
 
-.trip-check:hover {
-  border-color: var(--t-sea);
-}
+  textarea.trip-input {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
 
-.trip-check[aria-checked="true"] {
-  background: var(--t-sea);
-  border-color: var(--t-sea);
-  color: var(--t-on-accent);
-}
+  .trip select.trip-input {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--t-muted) 50%), linear-gradient(135deg, var(--t-muted) 50%, transparent 50%);
+    background-position:
+      calc(100% - 20px) 50%,
+      calc(100% - 15px) 50%;
+    background-size: 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 36px;
+  }
 
-.trip-surprise {
-  background:
-    linear-gradient(120deg, rgb(214 184 118 / 0.16), transparent 55%),
-    var(--t-surface);
-  border: 1px solid rgb(214 184 118 / 0.5);
-}
+  .trip :focus-visible {
+    outline: 2px solid var(--t-sea);
+    outline-offset: 3px;
+  }
 
-.trip-toast {
-  position: fixed;
-  left: 50%;
-  bottom: calc(var(--t-nav-h) + var(--safe-b) + 18px);
-  z-index: 60;
-  width: min(520px, calc(100vw - 32px));
-  transform: translateX(-50%);
-  animation: trip-rise 220ms ease-out both;
-}
+  /* Floating tab bar — a soft pill that sits above the safe area. */
+  .trip-nav {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--safe-b) + 12px);
+    z-index: 40;
+    width: min(560px, calc(100vw - 24px));
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.86);
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+    box-shadow: var(--t-shadow-lg), inset 0 0 0 1px rgb(255 255 255 / 0.8);
+  }
 
-.trip-toast-body {
-  background: var(--t-raised);
-  color: var(--t-ink);
-  border: 1px solid rgb(214 184 118 / 0.35);
-  box-shadow: 0 20px 50px -20px rgb(0 0 0 / 0.9);
-}
+  .trip-nav button[aria-current="page"] {
+    color: var(--t-sea-strong);
+  }
 
-.trip-toast-warn {
-  background: var(--t-raised);
-  color: var(--t-coral);
-  border: 1px solid rgb(227 140 118 / 0.5);
-}
+  .trip-nav-pill {
+    position: absolute;
+    inset: 6px 8px;
+    z-index: -1;
+    border-radius: 999px;
+    background: var(--t-sea-soft);
+  }
 
-.trip-scroll-x {
-  scrollbar-width: none;
-}
+  .trip-fab {
+    border-radius: 999px;
+    background: linear-gradient(160deg, color-mix(in srgb, var(--t-sea) 72%, white), var(--t-sea));
+    color: var(--t-on-accent);
+    box-shadow:
+      0 0 0 5px rgb(255 255 255 / 0.9),
+      0 12px 26px -8px color-mix(in srgb, var(--t-sea) 75%, transparent);
+    transition: transform 160ms ease;
+  }
 
-.trip-scroll-x::-webkit-scrollbar {
-  display: none;
-}
+  .trip-fab:active {
+    transform: scale(0.93);
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  .trip-sheet,
-  .trip-sheet-overlay,
+  /* Bottom sheet */
+  .trip-sheet-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgb(43 24 48 / 0.28);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    animation: trip-fade 200ms ease-out both;
+  }
+
+  .trip-sheet {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 51;
+    margin: 0 auto;
+    display: flex;
+    max-height: 92svh;
+    max-width: 560px;
+    flex-direction: column;
+    background:
+      radial-gradient(80% 30% at 50% 0%, color-mix(in srgb, var(--t-wash) 70%, transparent), transparent 70%),
+      var(--t-canvas);
+    color: var(--t-ink);
+    border-radius: 30px 30px 0 0;
+    box-shadow: 0 -20px 60px -20px rgb(90 40 90 / 0.35);
+    padding-bottom: var(--safe-b);
+    animation: trip-rise 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .trip-sheet::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 5px;
+    margin: 10px auto 0;
+    border-radius: 999px;
+    background: var(--t-line-strong);
+  }
+
+  @media (min-width: 640px) {
+    .trip-sheet {
+      inset: auto 0 24px 0;
+      border-radius: 30px;
+    }
+  }
+
+  .trip-sheet-footer {
+    background: rgb(255 255 255 / 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--t-line);
+  }
+
+  @keyframes trip-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes trip-rise {
+    from {
+      transform: translateY(40px);
+      opacity: 0;
+    }
+  }
+
+  .trip-bar {
+    display: flex;
+    height: 8px;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--t-sunk);
+  }
+
+  .trip-bar > span {
+    height: 100%;
+  }
+
+  .trip-bar > span:first-child {
+    border-radius: 999px 0 0 999px;
+  }
+
+  .trip-hatch {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      color-mix(in srgb, var(--t-sea) 55%, transparent) 0 3px,
+      color-mix(in srgb, var(--t-sea) 16%, transparent) 3px 6px
+    );
+  }
+
+  .trip-check {
+    display: inline-flex;
+    height: 30px;
+    width: 30px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1.5px solid var(--t-line-strong);
+    background: var(--t-surface);
+    color: transparent;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      transform 160ms ease;
+  }
+
+  .trip-check:active {
+    transform: scale(0.9);
+  }
+
+  .trip-check[aria-checked="true"] {
+    background: var(--t-sea);
+    border-color: var(--t-sea);
+    color: var(--t-on-accent);
+  }
+
+  .trip-surprise {
+    background: linear-gradient(135deg, var(--t-lavender), var(--t-sea-soft));
+    border-radius: var(--t-r-sm);
+  }
+
+  /* Centred with margins, not transforms — Motion owns this element's transform. */
   .trip-toast {
-    animation: none;
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: calc(var(--t-nav-h) + var(--safe-b) + 28px);
+    z-index: 60;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .trip-toast-body {
+    border-radius: 999px;
+    background: var(--t-ink);
+    color: #fff;
+    box-shadow: var(--t-shadow-lg);
+  }
+
+  .trip-toast-warn {
+    border-radius: 999px;
+    background: var(--t-coral);
+    color: #fff;
+    box-shadow: var(--t-shadow-lg);
+  }
+
+  .trip-scroll-x {
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+  }
+
+  .trip-scroll-x::-webkit-scrollbar {
+    display: none;
+  }
+
+  .trip-scroll-x > * {
+    scroll-snap-align: start;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trip-sheet,
+    .trip-sheet-overlay {
+      animation: none;
+    }
   }
 }
-}
 
-/* Unlayered on purpose: must beat the utility. Jost reads heavy at 600 — the luxe register stays at 500 and lets size carry hierarchy. */
+/* Unlayered on purpose: must beat the utility. Jost reads heavy at 600 — the trip keeps to 500 and lets size carry hierarchy. */
 .trip .font-semibold {
   font-weight: 500;
 }

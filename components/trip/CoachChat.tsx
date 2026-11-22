@@ -53,7 +53,7 @@ export function CoachChat({ api }: { api: string }) {
           {messages.map((message) => (
             <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
-                className={`max-w-[85%] whitespace-pre-wrap px-3 py-2 text-sm ${
+                className={`max-w-[85%] whitespace-pre-wrap rounded-[20px] px-4 py-2.5 text-sm ${
                   message.role === "user" ? "border border-[rgb(214_184_118/0.4)] bg-[var(--t-sea-soft)] text-[var(--t-ink)]" : "border border-[var(--t-line)] text-[var(--t-ink)]"
                 }`}
               >
@@ -63,7 +63,7 @@ export function CoachChat({ api }: { api: string }) {
           ))}
           {status === "submitted" && (
             <div className="flex justify-start">
-              <div className="border border-[var(--t-line)] px-3 py-2 text-sm text-[var(--t-muted)]">Thinking…</div>
+              <div className="rounded-[20px] border border-[var(--t-line)] px-4 py-2.5 text-sm text-[var(--t-muted)]">Thinking…</div>
             </div>
           )}
         </div>

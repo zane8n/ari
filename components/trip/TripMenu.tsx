@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CalendarPlus, Copy, ShareNetwork } from "@phosphor-icons/react";
+import { m } from "@/lib/motion/m";
 import { useTrip } from "./TripContext";
-import { Sheet } from "./ui";
+import { Sheet, ThemePicker } from "./ui";
 
 type PassView = { id: string; label: string; createdAt: string; claimedAt: string | null; lastSeenAt: string | null; revokedAt: string | null };
 
@@ -12,15 +13,33 @@ const when = (iso: string) => new Date(iso).toLocaleString("en-GB", { day: "nume
 
 /** The trip's settings sheet. Hosts manage passes here; guests just get the reminders calendar. */
 export function TripMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  const { bundle, api, isHost } = useTrip();
+  const { bundle, api, isHost, themeId, setThemeId, currency, currencies, setCurrency } = useTrip();
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title={bundle.trip.name} description={isHost ? "Access & settings" : "Settings"}>
-      <div className="flex flex-col gap-7 pb-2">
+    <Sheet open={open} onOpenChange={onOpenChange} title={bundle.trip.name} description="Just for this phone">
+      <div className="flex flex-col gap-9 pb-2">
+        <section className="flex flex-col gap-4">
+          <p className="trip-eyebrow text-center">Your colour</p>
+          <ThemePicker value={themeId} onChange={setThemeId} />
+        </section>
+
+        {currencies.length > 1 && (
+          <section className="flex items-center justify-between gap-3">
+            <p className="text-sm font-medium">Show money in</p>
+            <div className="trip-seg" role="group" aria-label="Display currency">
+              {currencies.map((c) => (
+                <button key={c} type="button" aria-pressed={currency === c} onClick={() => setCurrency(c)}>
+                  {currency === c && <span className="trip-seg-pill" />}
+                  {c}
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
         {isHost && <Passes />}
-        <section className="flex flex-col gap-2">
-          <p className="trip-eyebrow">Reminders</p>
-          <a href={api.remindersUrl} download className="trip-card flex items-center gap-3 px-4 py-3">
-            <CalendarPlus size={24} weight="light" className="shrink-0 text-[var(--t-sea)]" />
+        <section>
+          <a href={api.remindersUrl} download className="trip-soft flex items-center gap-3 px-5 py-4">
+            <CalendarPlus size={22} className="shrink-0 text-[var(--t-sea)]" />
             <span className="text-sm">
               Add the nightly {String(bundle.trip.checkinHour).padStart(2, "0")}:00 check-in to your calendar
             </span>
@@ -118,14 +137,14 @@ function Passes() {
   return (
     <section className="flex flex-col gap-3">
       <div>
-        <p className="trip-eyebrow">Passes</p>
-        <p className="mt-1 text-sm text-[var(--t-muted)]">A one-time link into this trip only. It opens once, on one device, and stays signed in there until you withdraw it.</p>
+        <p className="trip-eyebrow">Share the trip</p>
+        <p className="mt-1 text-sm leading-relaxed text-[var(--t-muted)]">A one-time pass opens this trip on one phone, once, and stays signed in there until you withdraw it.</p>
       </div>
 
       {fresh ? (
-        <div className="trip-pass-card flex flex-col gap-3 px-4 py-4">
-          <p className="trip-eyebrow">New pass · {fresh.label}</p>
-          <p className="font-mono text-xs break-all select-all">{fresh.url}</p>
+        <m.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35 }} className="trip-pass-card flex flex-col gap-4 p-6">
+          <p className="trip-eyebrow">A pass for {fresh.label}</p>
+          <p className="rounded-2xl bg-white/70 px-4 py-3 font-mono text-xs break-all select-all">{fresh.url}</p>
           <p className="text-[11px] text-[var(--t-muted)]">This link is shown once. Send it now.</p>
           <div className="flex gap-2">
             <button type="button" onClick={share} className="trip-btn trip-btn-primary flex-1">
@@ -135,10 +154,10 @@ function Passes() {
               <Copy size={16} /> {copied ? "Copied" : "Copy"}
             </button>
           </div>
-          <button type="button" onClick={() => setFresh(null)} className="trip-btn trip-btn-quiet self-center text-xs">
+          <button type="button" onClick={() => setFresh(null)} className="trip-btn trip-btn-quiet self-center">
             Done
           </button>
-        </div>
+        </m.div>
       ) : (
         <form onSubmit={create} className="flex gap-2">
           <input value={label} onChange={(e) => setLabel(e.target.value)} maxLength={40} placeholder="Who is it for? e.g. Her phone" aria-label="Pass name" className="trip-input" />
@@ -149,11 +168,11 @@ function Passes() {
       )}
 
       {passes && passes.length > 0 && (
-        <ul className="trip-card divide-y divide-[var(--t-line)]">
+        <ul className="trip-soft divide-y divide-[var(--t-line)] overflow-hidden">
           {passes.map((p) => {
             const status = p.revokedAt ? "Withdrawn" : p.claimedAt ? `In use · seen ${when(p.lastSeenAt ?? p.claimedAt)}` : "Not opened yet";
             return (
-              <li key={p.id} className={`flex items-center gap-3 px-3 py-2.5 ${p.revokedAt ? "opacity-50" : ""}`}>
+              <li key={p.id} className={`flex items-center gap-3 px-5 py-3 ${p.revokedAt ? "opacity-50" : ""}`}>
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-semibold">{p.label}</span>
                   <span className="block text-[11px] text-[var(--t-muted)]">{status}</span>

@@ -4,6 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { Currency, EventStatus, ItineraryEvent } from "@/db/schema";
 import { convertFromUsd, FALLBACK_RATES, formatMoney, type ExchangeRates } from "@/lib/currency/convert";
 import { minutesInZone, todayInZone } from "@/lib/trip/dates";
+import { saveTripTheme } from "@/lib/trip/theme";
+import type { ThemeId } from "@/lib/theme/themes";
 import { summarizeMoney, type MoneySummary } from "@/lib/trip/money";
 import type { CheckinView, SerializedBudgetItem, SerializedExpense, TaskView, TripBundle } from "@/lib/trip/types";
 import { createTripApi, ratesApi, type CreateEventInput, type CreateExpenseInput, type TripApi, type UpdateBudgetItemInput, type UpdateEventInput } from "./tripApi";
@@ -16,6 +18,9 @@ type TripStore = {
   bundle: TripBundle;
   /** Host (full control) vs a guest on a one-time pass (everything except managing access). */
   isHost: boolean;
+  /** This device's palette — each person picks their own. */
+  themeId: ThemeId;
+  setThemeId: (id: ThemeId) => void;
   api: TripApi;
   today: string;
   minutesNow: number;
@@ -77,7 +82,12 @@ function upsert<T extends { id: string }>(list: T[], row: T): T[] {
   return list.some((x) => x.id === row.id) ? list.map((x) => (x.id === row.id ? row : x)) : [...list, row];
 }
 
-export function TripProvider({ initial, isHost, children }: { initial: TripBundle; isHost: boolean; children: React.ReactNode }) {
+export function TripProvider({ initial, isHost, themeId: initialTheme, children }: { initial: TripBundle; isHost: boolean; themeId: ThemeId; children: React.ReactNode }) {
+  const [themeId, setThemeState] = useState<ThemeId>(initialTheme);
+  const setThemeId = useCallback((id: ThemeId) => {
+    setThemeState(id);
+    saveTripTheme(id);
+  }, []);
   const [bundle, setBundle] = useState(initial);
   const { trip } = bundle;
   const api = useMemo(() => createTripApi(trip.slug), [trip.slug]);
@@ -323,6 +333,8 @@ export function TripProvider({ initial, isHost, children }: { initial: TripBundl
   const value: TripStore = {
     bundle,
     isHost,
+    themeId,
+    setThemeId,
     api,
     today: clock.today,
     minutesNow: clock.minutesNow,

@@ -5,8 +5,9 @@ import { BUDGET_CATEGORY_VALUES, type BudgetCategory, type Currency, type Expens
 import { convertFromUsd, convertToUsd, formatMoney } from "@/lib/currency/convert";
 import { CATEGORY_LABELS } from "@/lib/trip/analysis";
 import { formatDayMonth, formatWeekday } from "@/lib/trip/dates";
+import { m } from "@/lib/motion/m";
 import { useTrip, type LogRequest } from "./TripContext";
-import { Sheet } from "./ui";
+import { ease, Reveal, Sheet } from "./ui";
 
 /** Round a converted planning figure to something you'd actually hand over (KES to the nearest 10). */
 function roundForCash(amount: number, currency: Currency): number {
@@ -32,7 +33,7 @@ function QuickLogBody({ logRequest }: { logRequest: LogRequest }) {
   const tripDates = useMemo(() => days.map((d) => d.date), [days]);
   const defaultDay = tripDates.includes(today) ? today : null;
 
-  const linesById = useMemo(() => new Map(money.items.map((m) => [m.item.id, m])), [money.items]);
+  const linesById = useMemo(() => new Map(money.items.map((x) => [x.item.id, x])), [money.items]);
   const initialLine = logRequest.budgetItemId ? linesById.get(logRequest.budgetItemId) : undefined;
 
   const [amount, setAmount] = useState(() =>
@@ -51,10 +52,10 @@ function QuickLogBody({ logRequest }: { logRequest: LogRequest }) {
   const selectedDay = day ?? today;
   // What-for suggestions: that day's unpaid one-offs first, then the running pots, then anything else still open.
   const suggestions = useMemo(() => {
-    const open = money.items.filter((m) => !m.item.isReserve && m.item.status === "open");
-    const dayFixed = open.filter((m) => m.item.kind === "fixed" && m.item.day === selectedDay);
-    const running = open.filter((m) => m.item.kind === "running");
-    const rest = open.filter((m) => m.item.kind === "fixed" && m.item.day !== selectedDay);
+    const open = money.items.filter((x) => !x.item.isReserve && x.item.status === "open");
+    const dayFixed = open.filter((x) => x.item.kind === "fixed" && x.item.day === selectedDay);
+    const running = open.filter((x) => x.item.kind === "running");
+    const rest = open.filter((x) => x.item.kind === "fixed" && x.item.day !== selectedDay);
     return { dayFixed, running, rest };
   }, [money.items, selectedDay]);
 
@@ -110,60 +111,56 @@ function QuickLogBody({ logRequest }: { logRequest: LogRequest }) {
           e.preventDefault();
           void save();
         }}
-        className="flex flex-col gap-5"
+        className="flex flex-col gap-7"
       >
-        <div>
-          <div className="flex items-stretch gap-2">
-            <div className="trip-seg shrink-0" role="group" aria-label="Currency paid in">
-              {[trip.spendCurrency, ...(trip.spendCurrency === "USD" ? [] : (["USD"] as Currency[]))].map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  aria-pressed={currency === c}
-                  onClick={() => setCurrency(c)}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-            <input
-              ref={amountRef}
-              autoFocus
-              inputMode="decimal"
-              enterKeyHint="done"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value.replace(/[^\d.,]/g, ""))}
-              placeholder="0"
-              aria-label={`Amount in ${currency}`}
-              className="trip-input trip-num !min-h-[64px] flex-1 !text-4xl"
-            />
-          </div>
-          <div className="mt-1.5 flex min-h-[28px] items-center justify-between gap-2 text-xs text-[var(--t-muted)]">
-            <span>{usdPreview ? `≈ ${usdPreview}` : " "}</span>
+        <div className="flex flex-col items-center gap-3 pt-2">
+          <input
+            ref={amountRef}
+            autoFocus
+            inputMode="decimal"
+            enterKeyHint="done"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value.replace(/[^\d.,]/g, ""))}
+            placeholder="0"
+            aria-label={`Amount in ${currency}`}
+            className="trip-num w-full bg-transparent text-center text-[68px] leading-none caret-[var(--t-sea)] outline-none placeholder:text-[var(--t-line-strong)]"
+          />
+          <p className="min-h-[18px] text-xs text-[var(--t-muted)]">{currency}{usdPreview ? ` · ≈ ${usdPreview}` : ""}</p>
+          <div className="flex items-center gap-3">
+            {trip.spendCurrency !== "USD" && (
+              <div className="trip-seg" role="group" aria-label="Currency paid in">
+                {[trip.spendCurrency, "USD" as Currency].map((c) => (
+                  <button key={c} type="button" aria-pressed={currency === c} onClick={() => setCurrency(c)}>
+                    {currency === c && <span className="trip-seg-pill" />}
+                    {c}
+                  </button>
+                ))}
+              </div>
+            )}
             {selected && (
-              <button type="button" onClick={fillAsPlanned} className="font-semibold text-[var(--t-sea)] underline underline-offset-2">
-                {selected.item.kind === "running" ? `Fill what's left (${fmt(selected.stillExpectedUsd)})` : `As planned · ${fmt(selected.item.estimatedUsd)}`}
+              <button type="button" onClick={fillAsPlanned} className="trip-chip !min-h-[40px] !text-[13px]">
+                {selected.item.kind === "running" ? `What's left · ${fmt(selected.stillExpectedUsd)}` : `As planned · ${fmt(selected.item.estimatedUsd)}`}
               </button>
             )}
           </div>
         </div>
 
-        <fieldset className="flex flex-col gap-2">
-          <legend className="trip-eyebrow mb-2">What for</legend>
+        <fieldset className="flex flex-col gap-3">
+          <legend className="trip-eyebrow mb-3 w-full text-center">What was it for?</legend>
           {suggestions.dayFixed.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {suggestions.dayFixed.map((m) => (
-                <button key={m.item.id} type="button" aria-pressed={itemId === m.item.id} onClick={() => choose(m.item.id)} className="trip-chip">
-                  {m.item.label}
-                  <span className="text-[11px] font-medium opacity-70">{fmt(m.item.estimatedUsd)}</span>
+            <div className="flex flex-wrap justify-center gap-2">
+              {suggestions.dayFixed.map((x) => (
+                <button key={x.item.id} type="button" aria-pressed={itemId === x.item.id} onClick={() => choose(x.item.id)} className="trip-chip">
+                  {x.item.label}
+                  <span className="text-[11px] font-medium opacity-70">{fmt(x.item.estimatedUsd)}</span>
                 </button>
               ))}
             </div>
           )}
-          <div className="flex flex-wrap gap-2">
-            {suggestions.running.map((m) => (
-              <button key={m.item.id} type="button" aria-pressed={itemId === m.item.id} onClick={() => choose(m.item.id)} className="trip-chip">
-                {m.item.label}
+          <div className="flex flex-wrap justify-center gap-2">
+            {suggestions.running.map((x) => (
+              <button key={x.item.id} type="button" aria-pressed={itemId === x.item.id} onClick={() => choose(x.item.id)} className="trip-chip">
+                {x.item.label}
               </button>
             ))}
             <button
@@ -182,19 +179,18 @@ function QuickLogBody({ logRequest }: { logRequest: LogRequest }) {
             <p className="text-xs text-[var(--t-muted)]">Planned for {selected.item.day ? `${formatWeekday(selected.item.day)} ${formatDayMonth(selected.item.day)}` : "any day"}.</p>
           )}
           {suggestions.rest.length > 0 && !other && (
-            <details className="text-sm">
-              <summary className="cursor-pointer py-2 font-semibold text-[var(--t-muted)]">Other planned items ({suggestions.rest.length})</summary>
-              <div className="flex flex-wrap gap-2 pt-1">
-                {suggestions.rest.map((m) => (
-                  <button key={m.item.id} type="button" aria-pressed={itemId === m.item.id} onClick={() => choose(m.item.id)} className="trip-chip">
-                    {m.item.label}
+            <Reveal label={`Something else we planned (${suggestions.rest.length})`}>
+              <div className="flex flex-wrap gap-2">
+                {suggestions.rest.map((x) => (
+                  <button key={x.item.id} type="button" aria-pressed={itemId === x.item.id} onClick={() => choose(x.item.id)} className="trip-chip">
+                    {x.item.label}
                   </button>
                 ))}
               </div>
-            </details>
+            </Reveal>
           )}
           {other && (
-            <div className="flex flex-col gap-2 border-l-2 border-[var(--t-sea)] pl-3">
+            <m.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease }} className="flex flex-col gap-3">
               <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="e.g. Coconut on the beach" aria-label="What was it" className="trip-input" autoFocus />
               <div className="flex flex-wrap gap-1.5">
                 {BUDGET_CATEGORY_VALUES.filter((c) => c !== "accommodation").map((c) => (
@@ -203,34 +199,36 @@ function QuickLogBody({ logRequest }: { logRequest: LogRequest }) {
                   </button>
                 ))}
               </div>
-            </div>
+            </m.div>
           )}
         </fieldset>
 
-        <div className="grid grid-cols-2 gap-3">
-          <label className="flex flex-col gap-1">
-            <span className="trip-eyebrow">Day</span>
-            <select value={day ?? ""} onChange={(e) => setDay(e.target.value || null)} className="trip-input">
-              {tripDates.map((d) => (
-                <option key={d} value={d}>
-                  {formatWeekday(d)} {formatDayMonth(d)}
-                  {d === today ? " · today" : ""}
-                </option>
-              ))}
-              <option value="">Not a trip day</option>
-            </select>
-          </label>
-          <label className="flex flex-col gap-1">
-            <span className="trip-eyebrow">Paid from</span>
-            <select value={fund} onChange={(e) => setFund(e.target.value as ExpenseFund)} className="trip-input">
-              <option value="pot">Shared pot</option>
-              <option value="reserve">Emergency reserve</option>
-            </select>
-          </label>
-        </div>
-        {fund === "reserve" && (
-          <p className="bg-[var(--t-coral-soft)] px-3 py-2 text-xs text-[var(--t-coral)]">The reserve is for emergencies, not optional extras. It&apos;s tracked separately from the pot.</p>
-        )}
+        <Reveal label={`${day ? `${formatWeekday(day)} ${formatDayMonth(day)}` : "Not a trip day"} · ${fund === "pot" ? "from our pot" : "from the reserve"}`} defaultOpen={fund === "reserve"}>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="flex flex-col gap-1.5">
+              <span className="trip-eyebrow">Day</span>
+              <select value={day ?? ""} onChange={(e) => setDay(e.target.value || null)} className="trip-input">
+                {tripDates.map((d) => (
+                  <option key={d} value={d}>
+                    {formatWeekday(d)} {formatDayMonth(d)}
+                    {d === today ? " · today" : ""}
+                  </option>
+                ))}
+                <option value="">Not a trip day</option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="trip-eyebrow">Paid from</span>
+              <select value={fund} onChange={(e) => setFund(e.target.value as ExpenseFund)} className="trip-input">
+                <option value="pot">Our pot</option>
+                <option value="reserve">Emergency reserve</option>
+              </select>
+            </label>
+          </div>
+          {fund === "reserve" && (
+            <p className="mt-3 rounded-2xl bg-[var(--t-coral-soft)] px-4 py-3 text-xs text-[var(--t-coral)]">The reserve is for emergencies, not treats. It&apos;s kept apart from the pot.</p>
+          )}
+        </Reveal>
       </form>
     </Sheet>
   );
