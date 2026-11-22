@@ -18,10 +18,10 @@ import {
 } from "recharts";
 import type { CategoryBreakdown, CumulativePoint, CurrencyMix, DaySpend, StatusBreakdown, VarianceItem } from "@/lib/trip/analysis";
 
-const INK = "#0b0b0b";
+const INK = "#10262e";
 const MUTED = "#898781";
 const GRID = "#e1e0d9";
-const SURFACE = "#fcfcfb";
+const SURFACE = "#fffdf7";
 
 /** Recharts' tooltip formatter types values loosely (string | number | undefined) — normalize once. */
 function toNum(value: unknown): number {
@@ -30,9 +30,9 @@ function toNum(value: unknown): number {
 
 function ChartCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-black/10 bg-white px-4 py-4">
-      <h3 className="text-sm font-semibold text-ink">{title}</h3>
-      {subtitle && <p className="text-xs text-ink-muted">{subtitle}</p>}
+    <div className="trip-card px-4 py-4">
+      <h3 className="font-display text-lg leading-tight font-semibold">{title}</h3>
+      {subtitle && <p className="text-xs text-[var(--t-muted)]">{subtitle}</p>}
       <div className="mt-3">{children}</div>
     </div>
   );
@@ -150,13 +150,13 @@ export function VarianceList({ variances, money }: { variances: VarianceItem[]; 
   const top = variances.slice(0, 5);
   if (top.length === 0) return null;
   return (
-    <div className="rounded-lg border border-black/10 bg-white px-4 py-4">
-      <h3 className="text-sm font-semibold text-ink">Biggest surprises</h3>
-      <p className="text-xs text-ink-muted">Items furthest from their planned estimate</p>
+    <div className="trip-card px-4 py-4">
+      <h3 className="font-display text-lg leading-tight font-semibold">Biggest surprises</h3>
+      <p className="text-xs text-[var(--t-muted)]">Items furthest from their planned estimate</p>
       <ul className="mt-3 flex flex-col gap-2">
         {top.map((item) => (
           <li key={item.id} className="flex items-center justify-between gap-3 text-sm">
-            <span className="min-w-0 truncate text-ink">{item.label}</span>
+            <span className="min-w-0 truncate">{item.label}</span>
             <span className={`shrink-0 font-medium tabular-nums ${item.varianceUsd > 0 ? "text-red-600" : "text-green-700"}`}>
               {item.varianceUsd > 0 ? "+" : ""}
               {money(item.varianceUsd)}

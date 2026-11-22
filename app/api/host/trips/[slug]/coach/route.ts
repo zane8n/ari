@@ -1,22 +1,15 @@
 import { NextResponse } from "next/server";
 import { convertToModelMessages, createUIMessageStreamResponse, streamText, toUIMessageStream, type UIMessage } from "ai";
-import { getDb } from "@/db/client";
-import { budgetItems, itineraryEvents, tripDays } from "@/db/schema";
-import { getEnv } from "@/lib/config/env";
-import { hasValidHostSession } from "@/lib/server/host-auth";
-import { isTrustedPost } from "@/lib/server/requestGuards";
+import { loadTripBundle } from "@/lib/server/trip";
+import { resolveTripRequest } from "@/lib/server/tripRoute";
 import { buildCoachSystemPrompt } from "@/lib/trip/coachContext";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-export async function POST(request: Request) {
-  if (!(await hasValidHostSession())) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
-  if (!isTrustedPost(request)) {
-    return NextResponse.json({ error: "Rejected." }, { status: 403 });
-  }
+export async function POST(request: Request, { params }: { params: Promise<{ slug: string }> }) {
+  const resolved = await resolveTripRequest(request, (await params).slug, "write");
+  if ("response" in resolved) return resolved.response;
 
   const json = await request.json().catch(() => null);
   const messages = json?.messages as UIMessage[] | undefined;
@@ -26,25 +19,7 @@ export async function POST(request: Request) {
   // A hard cap keeps a runaway client from ballooning the request into the model.
   const recentMessages = messages.slice(-30);
 
-  const db = getDb();
-  const [budgetRows, eventRows, dayRows] = await Promise.all([
-    db.select().from(budgetItems),
-    db.select().from(itineraryEvents),
-    db.select().from(tripDays),
-  ]);
-
-  const env = getEnv();
-  const systemPrompt = buildCoachSystemPrompt({
-    budgetItemRows: budgetRows,
-    events: eventRows,
-    tripDays: dayRows,
-    meta: {
-      destination: env.TRIP_DESTINATION,
-      homeBase: env.TRIP_HOME_BASE,
-      cashBudgetUsd: env.TRIP_CASH_BUDGET_USD,
-      reserveBudgetUsd: env.TRIP_RESERVE_BUDGET_USD,
-    },
-  });
+  const systemPrompt = buildCoachSystemPrompt(await loadTripBundle(resolved.trip));
 
   try {
     const result = streamText({

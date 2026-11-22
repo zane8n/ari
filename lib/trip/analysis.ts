@@ -1,5 +1,6 @@
 import type { BudgetCategory, EventStatus, ItineraryEvent } from "@/db/schema";
-import type { SerializedBudgetItem } from "@/lib/server/trip";
+import { summarizeMoney, type MoneySummary } from "./money";
+import type { CheckinView, SerializedBudgetItem, SerializedExpense } from "./types";
 
 export const CATEGORY_ORDER: BudgetCategory[] = ["food", "transport", "activities", "shopping", "accommodation", "other"];
 
@@ -42,16 +43,12 @@ export type CurrencyMix = { currency: string; usdEquivalent: number; count: numb
 export type StatusBreakdown = { status: EventStatus; label: string; count: number; color: string };
 
 export type TripAnalysis = {
-  totalEstimatedUsd: number;
-  totalActualLoggedUsd: number;
-  loggedItemCount: number;
-  totalItemCount: number;
-  cashBudgetUsd: number;
-  cashRemainingUsd: number;
-  reserveBudgetUsd: number;
-  reserveRemainingUsd: number;
+  money: MoneySummary;
+  loggedExpenseCount: number;
   budgetAdherencePct: number | null;
   itineraryCompletionPct: number;
+  checkinStreak: number;
+  checkinsDone: number;
   eventStatusCounts: StatusBreakdown[];
   categoryBreakdown: CategoryBreakdown[];
   daySpend: DaySpend[];
@@ -63,88 +60,81 @@ export type TripAnalysis = {
 
 const STATUS_LABELS: Record<EventStatus, string> = { planned: "Planned", done: "Done", skipped: "Skipped" };
 
-export function analyzeTrip(
-  budgetItems: SerializedBudgetItem[],
-  events: ItineraryEvent[],
-  tripDays: { date: string; label: string }[],
-  meta: { cashBudgetUsd: number; reserveBudgetUsd: number },
-): TripAnalysis {
-  const planned = budgetItems.filter((item) => !item.isReserve);
+/** Chart-ready view of a trip, layered on the money model in ./money so the numbers always agree with the Money view. */
+export function analyzeTrip(params: {
+  budgetItems: SerializedBudgetItem[];
+  expenses: SerializedExpense[];
+  events: ItineraryEvent[];
+  days: { date: string; label: string }[];
+  checkins: CheckinView[];
+  trip: { potUsd: number; reserveUsd: number; startDate: string; endDate: string };
+  today: string;
+}): TripAnalysis {
+  const { budgetItems, expenses, events, days, checkins, trip, today } = params;
+  const money = summarizeMoney({ ...trip, today, budgetItems, expenses });
+  const potExpenses = expenses.filter((e) => e.fund === "pot");
+  const planLines = money.items.filter((m) => !m.item.isReserve);
 
-  const totalEstimatedUsd = planned.reduce((sum, item) => sum + item.estimatedUsd, 0);
-  const loggedItems = planned.filter((item) => item.actualUsd !== null);
-  const totalActualLoggedUsd = loggedItems.reduce((sum, item) => sum + (item.actualUsd ?? 0), 0);
-  // Only items that ran over their own estimate draw against the reserve — running
-  // under elsewhere doesn't add slack back, so this is a sum of positive variances only.
-  const overflowUsd = loggedItems.reduce((sum, item) => sum + Math.max(0, (item.actualUsd ?? 0) - item.estimatedUsd), 0);
+  // Adherence compares estimate vs actual only for one-off lines whose cost is known so far.
+  const known = planLines.filter((m) => m.varianceUsd !== null && m.item.kind === "fixed");
+  const knownEstimate = known.reduce((sum, m) => sum + m.item.estimatedUsd, 0);
+  const knownActual = known.reduce((sum, m) => sum + m.paidUsd, 0);
+  const budgetAdherencePct = knownEstimate > 0 ? (knownEstimate / Math.max(knownActual, 0.01)) * 100 : null;
 
-  // Adherence compares actual vs estimate only for the items actually logged so far —
-  // not yet meaningful before anything has been logged.
-  const loggedEstimateTotal = loggedItems.reduce((sum, item) => sum + item.estimatedUsd, 0);
-  const budgetAdherencePct = loggedEstimateTotal > 0 ? (loggedEstimateTotal / Math.max(totalActualLoggedUsd, 0.01)) * 100 : null;
+  const categoryBreakdown: CategoryBreakdown[] = money.byCategory.map((row) => ({
+    category: row.category,
+    label: CATEGORY_LABELS[row.category],
+    estimatedUsd: row.plannedUsd,
+    actualUsd: row.spentUsd,
+    color: CATEGORY_COLORS[row.category],
+  }));
 
-  const categoryBreakdown: CategoryBreakdown[] = CATEGORY_ORDER.map((category) => {
-    const items = planned.filter((item) => item.category === category);
-    return {
-      category,
-      label: CATEGORY_LABELS[category],
-      estimatedUsd: items.reduce((sum, item) => sum + item.estimatedUsd, 0),
-      actualUsd: items.reduce((sum, item) => sum + (item.actualUsd ?? 0), 0),
-      color: CATEGORY_COLORS[category],
-    };
-  }).filter((row) => row.estimatedUsd > 0 || row.actualUsd > 0);
-
-  const daySpend: DaySpend[] = tripDays.map((day) => {
-    const items = planned.filter((item) => item.day === day.date);
+  const daySpend: DaySpend[] = days.map((day) => {
+    const lines = planLines.filter((m) => m.item.day === day.date);
+    const dayExpenses = potExpenses.filter((e) => e.day === day.date);
     return {
       date: day.date,
       label: day.label,
-      estimatedUsd: items.reduce((sum, item) => sum + item.estimatedUsd, 0),
-      actualUsd: items.reduce((sum, item) => sum + (item.actualUsd ?? 0), 0),
-      loggedCount: items.filter((item) => item.actualUsd !== null).length,
-      itemCount: items.length,
+      estimatedUsd: lines.reduce((sum, m) => sum + m.item.estimatedUsd, 0),
+      actualUsd: dayExpenses.reduce((sum, e) => sum + e.amountUsd, 0),
+      loggedCount: dayExpenses.length,
+      itemCount: lines.length,
     };
   });
 
   let runningEstimate = 0;
   let runningActual = 0;
-  let anyLoggedYet = false;
   const cumulative: CumulativePoint[] = daySpend.map((day) => {
     runningEstimate += day.estimatedUsd;
-    if (day.loggedCount > 0) anyLoggedYet = true;
     runningActual += day.actualUsd;
     return {
       date: day.date,
       label: day.label,
       cumulativeEstimatedUsd: runningEstimate,
-      cumulativeActualUsd: anyLoggedYet ? runningActual : null,
+      cumulativeActualUsd: day.date <= today ? runningActual : null,
     };
   });
 
-  const variances: VarianceItem[] = loggedItems
-    .map((item) => ({
-      id: item.id,
-      label: item.label,
-      category: item.category,
-      estimatedUsd: item.estimatedUsd,
-      actualUsd: item.actualUsd ?? 0,
-      varianceUsd: (item.actualUsd ?? 0) - item.estimatedUsd,
+  const variances: VarianceItem[] = planLines
+    .filter((m) => m.varianceUsd !== null)
+    .map((m) => ({
+      id: m.item.id,
+      label: m.item.label,
+      category: m.item.category,
+      estimatedUsd: m.item.estimatedUsd,
+      actualUsd: m.paidUsd,
+      varianceUsd: m.varianceUsd ?? 0,
     }))
     .sort((a, b) => Math.abs(b.varianceUsd) - Math.abs(a.varianceUsd));
 
   const currencyTotals = new Map<string, { usd: number; count: number }>();
-  for (const item of loggedItems) {
-    const currency = item.actualCurrency ?? "USD";
-    const entry = currencyTotals.get(currency) ?? { usd: 0, count: 0 };
-    entry.usd += item.actualUsd ?? 0;
+  for (const e of expenses) {
+    const entry = currencyTotals.get(e.currency) ?? { usd: 0, count: 0 };
+    entry.usd += e.amountUsd;
     entry.count += 1;
-    currencyTotals.set(currency, entry);
+    currencyTotals.set(e.currency, entry);
   }
-  const currencyMix: CurrencyMix[] = [...currencyTotals.entries()].map(([currency, v]) => ({
-    currency,
-    usdEquivalent: v.usd,
-    count: v.count,
-  }));
+  const currencyMix: CurrencyMix[] = [...currencyTotals.entries()].map(([currency, v]) => ({ currency, usdEquivalent: v.usd, count: v.count }));
 
   const statusCounts: Record<EventStatus, number> = { planned: 0, done: 0, skipped: 0 };
   for (const event of events) statusCounts[event.status] += 1;
@@ -154,31 +144,34 @@ export function analyzeTrip(
     count: statusCounts[status],
     color: STATUS_COLORS[status],
   }));
-
   const itineraryCompletionPct = events.length > 0 ? (statusCounts.done / events.length) * 100 : 0;
 
-  // A deliberately extra, slightly tongue-in-cheek composite metric — half budget
-  // discipline, half itinerary follow-through, clamped to keep it sane if nothing
-  // has been logged yet.
-  const budgetComponent = budgetAdherencePct !== null ? Math.max(0, Math.min(100, budgetAdherencePct)) : 100;
-  const healthScore = Math.round(budgetComponent * 0.5 + itineraryCompletionPct * 0.5);
+  // Consecutive checked-in days, counting back from the most recent elapsed trip day (today may still be pending).
+  const checked = new Set(checkins.map((c) => c.day));
+  const elapsed = days
+    .map((d) => d.date)
+    .filter((d) => d <= today)
+    .sort()
+    .reverse();
+  let checkinStreak = 0;
+  for (const date of elapsed) {
+    if (checked.has(date)) checkinStreak += 1;
+    else if (date !== today) break;
+  }
+
+  // A deliberately tongue-in-cheek composite: budget discipline, follow-through and the check-in habit.
+  const budgetComponent = money.headroomUsd >= 0 ? 100 : Math.max(0, 100 + (money.headroomUsd / Math.max(1, money.potUsd)) * 400);
+  const pastDays = elapsed.filter((d) => d < today);
+  const checkinComponent = pastDays.length > 0 ? (pastDays.filter((d) => checked.has(d)).length / pastDays.length) * 100 : 100;
+  const healthScore = Math.round(budgetComponent * 0.4 + itineraryCompletionPct * 0.3 + checkinComponent * 0.3);
 
   return {
-    totalEstimatedUsd,
-    totalActualLoggedUsd,
-    loggedItemCount: loggedItems.length,
-    totalItemCount: planned.length,
-    // Remaining tracks the live itemized plan (what's left to spend of what's actually
-    // budgeted line by line), not the separately configured cash figure — the two can
-    // drift apart as items are added or re-estimated during the trip.
-    cashBudgetUsd: meta.cashBudgetUsd,
-    cashRemainingUsd: totalEstimatedUsd - totalActualLoggedUsd,
-    // Remaining margin after absorbing cost overruns on the rest of the plan — see
-    // overflowUsd above.
-    reserveBudgetUsd: meta.reserveBudgetUsd,
-    reserveRemainingUsd: meta.reserveBudgetUsd - overflowUsd,
+    money,
+    loggedExpenseCount: expenses.length,
     budgetAdherencePct,
     itineraryCompletionPct,
+    checkinStreak,
+    checkinsDone: checkins.length,
     eventStatusCounts,
     categoryBreakdown,
     daySpend,

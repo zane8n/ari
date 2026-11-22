@@ -11,10 +11,10 @@ const STARTER_PROMPTS = [
   "Which day looks the riskiest?",
 ];
 
-export function CoachChat() {
+export function CoachChat({ api }: { api: string }) {
   const [input, setInput] = useState("");
   const { messages, sendMessage, status, error } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/host/trip/coach" }),
+    transport: new DefaultChatTransport({ api }),
   });
 
   const busy = status === "submitted" || status === "streaming";
@@ -27,10 +27,10 @@ export function CoachChat() {
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-black/10 bg-white px-4 py-4">
+    <div className="flex flex-col gap-3 trip-card px-4 py-4">
       <div>
-        <h3 className="text-sm font-semibold text-ink">Trip coach</h3>
-        <p className="text-xs text-ink-muted">Ask it anything about the budget or itinerary — it sees the live data.</p>
+        <h3 className="font-display text-lg leading-tight font-semibold">Trip coach</h3>
+        <p className="text-xs text-[var(--t-muted)]">Ask it anything about the budget or itinerary — it sees the live data.</p>
       </div>
 
       {messages.length === 0 && (
@@ -40,7 +40,7 @@ export function CoachChat() {
               key={prompt}
               type="button"
               onClick={() => handleSend(prompt)}
-              className="rounded-full border border-black/15 px-3 py-2 text-xs text-ink-muted hover:border-black/30 hover:text-ink"
+              className="trip-chip !min-h-[36px] !text-xs"
             >
               {prompt}
             </button>
@@ -53,8 +53,8 @@ export function CoachChat() {
           {messages.map((message) => (
             <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
-                className={`max-w-[85%] whitespace-pre-wrap rounded-lg px-3 py-2 text-sm ${
-                  message.role === "user" ? "bg-ink text-white" : "border border-black/10 bg-black/[0.02] text-ink"
+                className={`max-w-[85%] whitespace-pre-wrap px-3 py-2 text-sm ${
+                  message.role === "user" ? "bg-[var(--t-ink)] text-[var(--t-surface)]" : "border border-[var(--t-line)] text-[var(--t-ink)]"
                 }`}
               >
                 {message.parts.map((part, i) => (part.type === "text" ? <span key={i}>{part.text}</span> : null))}
@@ -63,7 +63,7 @@ export function CoachChat() {
           ))}
           {status === "submitted" && (
             <div className="flex justify-start">
-              <div className="rounded-lg border border-black/10 bg-black/[0.02] px-3 py-2 text-sm text-ink-muted">Thinking…</div>
+              <div className="border border-[var(--t-line)] px-3 py-2 text-sm text-[var(--t-muted)]">Thinking…</div>
             </div>
           )}
         </div>
@@ -85,12 +85,12 @@ export function CoachChat() {
           onChange={(event) => setInput(event.target.value)}
           placeholder="Ask the coach…"
           disabled={busy}
-          className="min-w-0 flex-1 rounded-md border border-black/15 px-3 py-2.5 text-base outline-none focus:border-black/40 disabled:opacity-50"
+          className="trip-input min-w-0 flex-1 disabled:opacity-50"
         />
         <button
           type="submit"
           disabled={busy || !input.trim()}
-          className="shrink-0 rounded-md bg-ink px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+          className="trip-btn trip-btn-primary shrink-0"
         >
           {busy ? "…" : "Send"}
         </button>

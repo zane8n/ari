@@ -44,9 +44,11 @@ yarn-error.log*
 next-env.d.ts
 
 # real trip content — this repo is public; real dates, accommodation, budget
-# figures and itinerary must never be committed (see content/arusha-trip.ts)
+# figures and itinerary must never be committed (see content/trip-seed.ts)
 content/arusha-trip.local.ts
+content/trips/*.local.ts
 arusha_*_itinerary.md
+*_trip_blueprint_*.md
 
 # the real letter — same rule as the trip content above (see content/letter.ts)
 content/letter.local.ts

@@ -25,3 +25,6 @@ export function formatMoney(amount: number, currency: Currency): string {
     return `${currency} ${amount.toFixed(fractionDigits)}`;
   }
 }
+
+/** Planning-time rates, used only when the live provider can't be reached — a log is never blocked on a rate lookup. */
+export const FALLBACK_RATES: ExchangeRates = { USD: 1, KES: 129, TZS: 2645 };
