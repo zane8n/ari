@@ -699,99 +699,185 @@ h3 {
 }
 
 /*
- * Trip tracker — "coast" palette. Scoped to .trip so it never leaks into
- * the invitation experience. Sand canvas, deep-sea ink, lagoon teal for
- * action, coral strictly for warnings. Flat, square geometry to match the
- * rest of the site; numbers set in the display serif.
+ * Trip tracker — "obsidian & champagne". Scoped to .trip so it never leaks
+ * into the invitation experience. A warm near-black, ivory type, champagne
+ * gold reserved for action and fine detail, muted coral strictly for
+ * warnings. Square geometry and hairlines, numbers set in the display serif.
  */
+/* Layered as components so Tailwind utilities (w-28, min-h-…) can still override per use. */
+@layer components {
 .trip {
-  --t-canvas: #f4efe4;
-  --t-surface: #fffdf7;
-  --t-sunk: #ebe4d4;
-  --t-ink: #10262e;
-  --t-muted: #56676b;
-  --t-line: rgb(16 38 46 / 0.13);
-  --t-line-strong: rgb(16 38 46 / 0.28);
-  --t-sea: #0f6e74;
-  --t-sea-strong: #0a5257;
-  --t-sea-soft: #d7e9e6;
-  --t-coral: #b8442c;
-  --t-coral-soft: #f6dcd3;
-  --t-sun: #b77d14;
-  --t-sun-soft: #f5e6c4;
-  --t-good: #2b7a4b;
-  --t-good-soft: #d9ecdf;
-  --t-gilt: #a8823d;
-  --t-nav-h: 64px;
+  --t-canvas: #0c0b09;
+  --t-surface: #15130f;
+  --t-raised: #1c1a15;
+  --t-sunk: #22201a;
+  --t-ink: #f2ece0;
+  --t-muted: #a69e8e;
+  --t-line: rgb(226 205 160 / 0.11);
+  --t-line-strong: rgb(226 205 160 / 0.24);
+  --t-sea: #d6b876;
+  --t-sea-strong: #e8d3a0;
+  --t-sea-soft: rgb(214 184 118 / 0.12);
+  --t-on-accent: #17130a;
+  --t-coral: #e38c76;
+  --t-coral-soft: rgb(227 140 118 / 0.13);
+  --t-sun: #e3b35a;
+  --t-sun-soft: rgb(227 179 90 / 0.13);
+  --t-good: #9ccdab;
+  --t-good-soft: rgb(156 205 171 / 0.12);
+  --t-gilt: #c9a45c;
+  --t-nav-h: 68px;
 
   min-height: 100svh;
   background: var(--t-canvas);
   color: var(--t-ink);
+  color-scheme: dark;
+  font-family: var(--font-ui), var(--font-body), system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* A faint champagne light falling from the top, and fine grain — depth without decoration. */
+.trip-luxe {
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgb(214 184 118 / 0.09), transparent 60%),
+    radial-gradient(80% 50% at 100% 100%, rgb(214 184 118 / 0.04), transparent 70%),
+    var(--t-canvas);
+  background-attachment: fixed;
 }
 
 .trip h1,
 .trip h2,
 .trip h3 {
   color: var(--t-ink);
+  letter-spacing: -0.005em;
 }
 
 .trip-num {
   font-family: var(--font-display), Georgia, serif;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: -0.01em;
   font-variant-numeric: lining-nums tabular-nums;
 }
 
 .trip-eyebrow {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
   color: var(--t-muted);
 }
 
+.trip-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--t-gilt), transparent);
+}
+
 .trip-card {
-  background: var(--t-surface);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.025), transparent 40%), var(--t-surface);
   border: 1px solid var(--t-line);
+}
+
+/* The members'-card treatment — passes, the import drop zone. Double gold hairline. */
+.trip-pass-card {
+  position: relative;
+  background:
+    radial-gradient(100% 80% at 50% 0%, rgb(214 184 118 / 0.1), transparent 70%),
+    var(--t-surface);
+  border: 1px solid rgb(214 184 118 / 0.45);
+  box-shadow:
+    inset 0 0 0 5px var(--t-surface),
+    inset 0 0 0 6px rgb(214 184 118 / 0.22),
+    0 30px 80px -40px rgb(214 184 118 / 0.35);
+}
+
+.trip-header {
+  background: rgb(12 11 9 / 0.82);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border-bottom: 1px solid var(--t-line);
+}
+
+.trip-monogram {
+  display: inline-flex;
+  height: 40px;
+  width: 40px;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--t-sea);
+  border: 1px solid rgb(214 184 118 / 0.5);
+  box-shadow: inset 0 0 0 3px var(--t-canvas), inset 0 0 0 4px rgb(214 184 118 / 0.2);
+  transition: background-color 200ms ease;
+}
+
+.trip-monogram:hover {
+  background: var(--t-sea-soft);
+}
+
+.trip-seg {
+  display: flex;
+  border: 1px solid var(--t-line-strong);
+}
+
+.trip-seg button {
+  min-height: 34px;
+  min-width: 46px;
+  padding: 0 8px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--t-muted);
+}
+
+.trip-seg button[aria-pressed="true"] {
+  background: var(--t-sea);
+  color: var(--t-on-accent);
 }
 
 .trip-btn {
   display: inline-flex;
-  min-height: 44px;
+  min-height: 46px;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 0 16px;
-  font-size: 14px;
+  padding: 0 18px;
+  font-size: 12px;
   font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   border: 1px solid transparent;
   transition:
-    background-color 150ms ease,
-    border-color 150ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
     transform 120ms ease;
 }
 
 .trip-btn:active {
-  transform: scale(0.98);
+  transform: scale(0.985);
 }
 
 .trip-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
 .trip-btn-primary {
-  background: var(--t-sea);
-  color: #fff;
+  background: linear-gradient(180deg, #e2c88c, #c9a45c);
+  color: var(--t-on-accent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25);
 }
 
 .trip-btn-primary:hover {
-  background: var(--t-sea-strong);
+  background: linear-gradient(180deg, #ecd6a2, #d4b06a);
 }
 
 .trip-btn-ink {
   background: var(--t-ink);
-  color: var(--t-surface);
+  color: var(--t-canvas);
 }
 
 .trip-btn-ghost {
@@ -801,17 +887,30 @@ h3 {
 }
 
 .trip-btn-ghost:hover {
-  background: var(--t-sunk);
+  border-color: var(--t-sea);
+  color: var(--t-sea-strong);
 }
 
 .trip-btn-quiet {
   background: transparent;
   color: var(--t-muted);
   padding: 0 10px;
+  letter-spacing: 0.12em;
 }
 
 .trip-btn-quiet:hover {
   color: var(--t-ink);
+}
+
+/* Status-filled buttons (Done / Skip) */
+.trip-btn-good {
+  background: var(--t-good);
+  color: var(--t-on-accent);
+}
+
+.trip-btn-warn {
+  background: var(--t-coral);
+  color: var(--t-on-accent);
 }
 
 .trip-chip {
@@ -819,57 +918,85 @@ h3 {
   min-height: 40px;
   align-items: center;
   gap: 6px;
-  padding: 0 12px;
+  padding: 0 13px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 400;
   background: var(--t-surface);
   border: 1px solid var(--t-line-strong);
   color: var(--t-ink);
   text-align: left;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.trip-chip:hover {
+  border-color: rgb(214 184 118 / 0.6);
 }
 
 .trip-chip[aria-pressed="true"] {
-  background: var(--t-ink);
-  border-color: var(--t-ink);
-  color: var(--t-surface);
+  background: var(--t-sea);
+  border-color: var(--t-sea);
+  color: var(--t-on-accent);
+  font-weight: 500;
 }
 
 .trip-tag {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 7px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  gap: 5px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   background: var(--t-sunk);
   color: var(--t-muted);
+  border: 1px solid var(--t-line);
 }
 
 .trip-input {
-  min-height: 46px;
+  min-height: 48px;
   width: 100%;
-  padding: 0 12px;
+  padding: 0 14px;
   font-size: 16px;
-  background: var(--t-surface);
+  background: var(--t-raised);
   border: 1px solid var(--t-line-strong);
   color: var(--t-ink);
   outline: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.trip-input::placeholder {
+  color: rgb(166 158 142 / 0.6);
 }
 
 .trip-input:focus {
   border-color: var(--t-sea);
-  box-shadow: 0 0 0 3px rgb(15 110 116 / 0.15);
+  box-shadow: 0 0 0 3px rgb(214 184 118 / 0.14);
 }
 
 textarea.trip-input {
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.trip select.trip-input {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--t-muted) 50%), linear-gradient(135deg, var(--t-muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 13px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 32px;
 }
 
 .trip :focus-visible {
-  outline: 2px solid var(--t-sea);
-  outline-offset: 2px;
+  outline: 1px solid var(--t-sea);
+  outline-offset: 3px;
 }
 
 /* Bottom navigation — thumb-reach, safe-area aware. */
@@ -877,9 +1004,9 @@ textarea.trip-input {
   position: fixed;
   inset: auto 0 0 0;
   z-index: 40;
-  background: rgb(255 253 247 / 0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgb(12 11 9 / 0.88);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
   border-top: 1px solid var(--t-line);
   padding-bottom: var(--safe-b);
 }
@@ -891,17 +1018,22 @@ textarea.trip-input {
 .trip-nav button[aria-current="page"]::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 30%;
-  right: 30%;
-  height: 2px;
+  top: -1px;
+  left: 32%;
+  right: 32%;
+  height: 1px;
   background: var(--t-sea);
+  box-shadow: 0 0 12px rgb(214 184 118 / 0.8);
 }
 
 .trip-fab {
-  background: var(--t-sea);
-  color: #fff;
-  box-shadow: 0 8px 24px -8px rgb(15 110 116 / 0.6);
+  background: linear-gradient(180deg, #e2c88c, #b8934c);
+  color: var(--t-on-accent);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.3),
+    0 0 0 4px var(--t-canvas),
+    0 0 0 5px rgb(214 184 118 / 0.35),
+    0 14px 30px -10px rgb(214 184 118 / 0.55);
 }
 
 /* Bottom sheet */
@@ -909,8 +1041,10 @@ textarea.trip-input {
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgb(16 38 46 / 0.42);
-  animation: trip-fade 160ms ease-out both;
+  background: rgb(5 4 3 / 0.66);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: trip-fade 180ms ease-out both;
 }
 
 .trip-sheet {
@@ -922,19 +1056,27 @@ textarea.trip-input {
   max-height: 92svh;
   max-width: 560px;
   flex-direction: column;
-  background: var(--t-canvas);
+  background:
+    radial-gradient(100% 40% at 50% 0%, rgb(214 184 118 / 0.08), transparent 70%),
+    var(--t-canvas);
   color: var(--t-ink);
-  border-top: 3px solid var(--t-sea);
+  border-top: 1px solid rgb(214 184 118 / 0.55);
+  box-shadow: 0 -30px 80px -30px rgb(0 0 0 / 0.8);
   padding-bottom: var(--safe-b);
-  animation: trip-rise 220ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
+  animation: trip-rise 260ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
 }
 
 @media (min-width: 640px) {
   .trip-sheet {
     inset: auto 0 24px 0;
-    border: 1px solid var(--t-line);
-    border-top: 3px solid var(--t-sea);
+    border: 1px solid var(--t-line-strong);
+    border-top-color: rgb(214 184 118 / 0.55);
   }
+}
+
+.trip-sheet-footer {
+  background: var(--t-surface);
+  border-top: 1px solid var(--t-line);
 }
 
 @keyframes trip-fade {
@@ -945,7 +1087,7 @@ textarea.trip-input {
 
 @keyframes trip-rise {
   from {
-    transform: translateY(24px);
+    transform: translateY(28px);
     opacity: 0;
   }
 }
@@ -953,7 +1095,7 @@ textarea.trip-input {
 /* Pot bar: spent · still expected · free (or over). */
 .trip-bar {
   display: flex;
-  height: 10px;
+  height: 6px;
   width: 100%;
   overflow: hidden;
   background: var(--t-sunk);
@@ -964,46 +1106,63 @@ textarea.trip-input {
 }
 
 .trip-hatch {
-  background-image: repeating-linear-gradient(-45deg, var(--t-sea) 0 3px, var(--t-sea-soft) 3px 6px);
+  background-image: repeating-linear-gradient(-45deg, rgb(214 184 118 / 0.85) 0 2px, rgb(214 184 118 / 0.18) 2px 5px);
 }
 
 .trip-check {
   display: inline-flex;
-  height: 32px;
-  width: 32px;
+  height: 30px;
+  width: 30px;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid var(--t-line-strong);
+  border: 1px solid var(--t-line-strong);
   border-radius: 999px;
-  background: var(--t-surface);
+  background: var(--t-canvas);
   color: transparent;
   transition:
-    background-color 150ms ease,
-    border-color 150ms ease;
+    background-color 200ms ease,
+    border-color 200ms ease;
+}
+
+.trip-check:hover {
+  border-color: var(--t-sea);
 }
 
 .trip-check[aria-checked="true"] {
-  background: var(--t-good);
-  border-color: var(--t-good);
-  color: #fff;
+  background: var(--t-sea);
+  border-color: var(--t-sea);
+  color: var(--t-on-accent);
 }
 
 .trip-surprise {
   background:
-    linear-gradient(135deg, rgb(168 130 61 / 0.14), transparent 60%),
+    linear-gradient(120deg, rgb(214 184 118 / 0.16), transparent 55%),
     var(--t-surface);
-  border: 1px solid rgb(168 130 61 / 0.45);
+  border: 1px solid rgb(214 184 118 / 0.5);
 }
 
 .trip-toast {
   position: fixed;
   left: 50%;
-  bottom: calc(var(--t-nav-h) + var(--safe-b) + 16px);
+  bottom: calc(var(--t-nav-h) + var(--safe-b) + 18px);
   z-index: 60;
   width: min(520px, calc(100vw - 32px));
   transform: translateX(-50%);
-  animation: trip-rise 200ms ease-out both;
+  animation: trip-rise 220ms ease-out both;
+}
+
+.trip-toast-body {
+  background: var(--t-raised);
+  color: var(--t-ink);
+  border: 1px solid rgb(214 184 118 / 0.35);
+  box-shadow: 0 20px 50px -20px rgb(0 0 0 / 0.9);
+}
+
+.trip-toast-warn {
+  background: var(--t-raised);
+  color: var(--t-coral);
+  border: 1px solid rgb(227 140 118 / 0.5);
 }
 
 .trip-scroll-x {
@@ -1020,4 +1179,14 @@ textarea.trip-input {
   .trip-toast {
     animation: none;
   }
+}
+}
+
+/* Unlayered on purpose: must beat the utility. Jost reads heavy at 600 — the luxe register stays at 500 and lets size carry hierarchy. */
+.trip .font-semibold {
+  font-weight: 500;
+}
+
+.trip .font-bold {
+  font-weight: 600;
 }

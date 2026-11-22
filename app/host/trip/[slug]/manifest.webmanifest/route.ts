@@ -16,8 +16,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
       start_url: base,
       scope: base,
       display: "standalone",
-      background_color: "#f4efe4",
-      theme_color: "#f4efe4",
+      background_color: "#0c0b09",
+      theme_color: "#0c0b09",
       icons: [],
       shortcuts: [
         { name: "Log a spend", short_name: "Log", url: `${base}?log=1` },

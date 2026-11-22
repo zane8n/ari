@@ -264,6 +264,26 @@ export const tripTasks = pgTable(
 export type TripTask = typeof tripTasks.$inferSelect;
 
 /**
+ * One-time passes into a single trip. The link carries a random token (only
+ * its hash is stored); claiming it binds the device that opened it with a
+ * signed cookie and burns the link. Revoking a pass signs that device out.
+ */
+export const tripPasses = pgTable("trip_passes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tripId: uuid("trip_id")
+    .notNull()
+    .references(() => trips.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull().unique(),
+  label: text("label").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  claimedAt: timestamp("claimed_at", { withTimezone: true }),
+  lastSeenAt: timestamp("last_seen_at", { withTimezone: true }),
+  revokedAt: timestamp("revoked_at", { withTimezone: true }),
+});
+
+export type TripPass = typeof tripPasses.$inferSelect;
+
+/**
  * Private, time-locked letters — one row per letter, reached through an
  * unguessable `/letter/<token>` link. The body lives only here (this repo is
  * public; see content/letter.ts), and is never sent to the browser before

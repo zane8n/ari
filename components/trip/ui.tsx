@@ -26,7 +26,7 @@ export function Sheet({
         <Dialog.Content className="trip trip-sheet" style={{ minHeight: 0 }} aria-describedby={description ? undefined : undefined}>
           <div className="flex items-start justify-between gap-3 px-5 pt-4 pb-2">
             <div className="min-w-0">
-              <Dialog.Title className="font-display text-2xl leading-tight font-semibold">{title}</Dialog.Title>
+              <Dialog.Title className="font-display text-2xl leading-tight font-medium">{title}</Dialog.Title>
               {description ? (
                 <Dialog.Description className="mt-0.5 text-sm text-[var(--t-muted)]">{description}</Dialog.Description>
               ) : (
@@ -38,7 +38,7 @@ export function Sheet({
             </Dialog.Close>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-4">{children}</div>
-          {footer && <div className="border-t border-[var(--t-line)] bg-[var(--t-surface)] px-5 py-3">{footer}</div>}
+          {footer && <div className="trip-sheet-footer px-5 py-3">{footer}</div>}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -50,7 +50,7 @@ export function SectionTitle({ eyebrow, title, action }: { eyebrow?: string; tit
     <div className="flex items-end justify-between gap-3">
       <div>
         {eyebrow && <p className="trip-eyebrow">{eyebrow}</p>}
-        <h2 className="font-display text-xl leading-tight font-semibold">{title}</h2>
+        <h2 className="font-display text-xl leading-tight font-medium">{title}</h2>
       </div>
       {action}
     </div>

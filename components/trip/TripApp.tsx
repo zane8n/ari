@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ChartLineUp, Plus, SunHorizon, MapTrifold, Wallet } from "@phosphor-icons/react";
+import { ChartLineUp, MapTrifold, Plus, SunHorizon, Wallet } from "@phosphor-icons/react";
 import { daysBetween, formatDateRange, tripPhase } from "@/lib/trip/dates";
 import type { TripBundle } from "@/lib/trip/types";
 import { CheckinSheet } from "./CheckinSheet";
@@ -12,6 +11,7 @@ import { PlanView } from "./PlanView";
 import { QuickLogSheet } from "./QuickLogSheet";
 import { TodayView } from "./TodayView";
 import { TripProvider, useTrip } from "./TripContext";
+import { TripMenu } from "./TripMenu";
 
 export type TripTab = "today" | "plan" | "money" | "insights";
 
@@ -19,10 +19,11 @@ export type TripTab = "today" | "plan" | "money" | "insights";
  * The trip tracker shell. Entry points: /host/trip/<slug> (Today),
  * ?tab=plan|money|insights, ?log=1 (straight into the quick log — the
  * home-screen shortcut) and ?checkin=YYYY-MM-DD (the calendar reminder link).
+ * Reached either by the host or by a guest holding a one-time pass.
  */
-export function TripApp({ initial, entry }: { initial: TripBundle; entry: { tab?: TripTab; log?: boolean; checkin?: string } }) {
+export function TripApp({ initial, access, entry }: { initial: TripBundle; access: "host" | "guest"; entry: { tab?: TripTab; log?: boolean; checkin?: string } }) {
   return (
-    <TripProvider initial={initial}>
+    <TripProvider initial={initial} isHost={access === "host"}>
       <Shell entry={entry} />
     </TripProvider>
   );
@@ -39,6 +40,7 @@ function Shell({ entry }: { entry: { tab?: TripTab; log?: boolean; checkin?: str
   const { bundle, today, money, fmt, currency, currencies, setCurrency, openLog, openCheckin, toast, dismissToast } = useTrip();
   const { trip, days } = bundle;
   const [tab, setTab] = useState<TripTab>(entry.tab ?? "today");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Deep links open their sheet once, then the URL is cleaned so a refresh doesn't reopen it.
   useEffect(() => {
@@ -60,25 +62,22 @@ function Shell({ entry }: { entry: { tab?: TripTab; log?: boolean; checkin?: str
   const over = money.headroomUsd < 0;
 
   return (
-    <div className="trip">
-      <header className="sticky top-0 z-30 border-b border-[var(--t-line)] bg-[var(--t-canvas)]/95 backdrop-blur" style={{ paddingTop: "var(--safe-t)" }}>
-        <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 py-2.5">
-          <Link href="/host/trip?all=1" className="min-w-0 flex-1" aria-label="All trips">
-            <span className="font-display block truncate text-xl leading-tight font-semibold">{trip.name}</span>
-            <span className="block truncate text-[11px] font-semibold text-[var(--t-muted)]">
-              {status} · {formatDateRange(trip.startDate, trip.endDate)}
+    <div className="trip trip-luxe">
+      <header className="trip-header sticky top-0 z-30" style={{ paddingTop: "var(--safe-t)" }}>
+        <div className="mx-auto flex max-w-2xl items-center gap-3 px-5 pt-3 pb-2">
+          <button type="button" onClick={() => setMenuOpen(true)} className="trip-monogram shrink-0" aria-label="Trip menu">
+            {trip.name.slice(0, 1)}
+          </button>
+          <div className="min-w-0 flex-1">
+            <span className="trip-eyebrow block truncate" title={formatDateRange(trip.startDate, trip.endDate)}>
+              {status}
             </span>
-          </Link>
+            <span className="font-display block truncate text-[22px] leading-tight font-medium">{trip.name}</span>
+          </div>
           {currencies.length > 1 && (
-            <div className="flex shrink-0 border border-[var(--t-line-strong)]" role="group" aria-label="Display currency">
+            <div className="trip-seg shrink-0" role="group" aria-label="Display currency">
               {currencies.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  aria-pressed={currency === c}
-                  onClick={() => setCurrency(c)}
-                  className={`min-h-[36px] min-w-12 px-2 text-xs font-bold ${currency === c ? "bg-[var(--t-ink)] text-[var(--t-surface)]" : "text-[var(--t-muted)]"}`}
-                >
+                <button key={c} type="button" aria-pressed={currency === c} onClick={() => setCurrency(c)}>
                   {c}
                 </button>
               ))}
@@ -86,15 +85,20 @@ function Shell({ entry }: { entry: { tab?: TripTab; log?: boolean; checkin?: str
           )}
         </div>
         {tab !== "money" && (
-          <button type="button" onClick={() => go("money")} className="mx-auto flex w-full max-w-2xl items-baseline gap-2 px-4 pb-2 text-left text-xs">
-            <span className="font-semibold">Left {fmt(money.leftUsd)}</span>
-            <span className="text-[var(--t-muted)]">·</span>
+          <button type="button" onClick={() => go("money")} className="mx-auto flex w-full max-w-2xl items-baseline gap-2 px-5 pb-3 text-left text-xs">
+            <span className="text-[var(--t-muted)]">Left</span>
+            <span className="font-semibold">{fmt(money.leftUsd)}</span>
+            <span className="text-[9px] text-[var(--t-gilt)]" aria-hidden>
+              ◆
+            </span>
             <span className={over ? "font-semibold text-[var(--t-coral)]" : "text-[var(--t-muted)]"}>
               {over ? `plan runs ${fmt(-money.headroomUsd)} over` : `${fmt(money.extrasPerDayUsd)}/day free`}
             </span>
             {money.todaySpentUsd > 0 && (
               <>
-                <span className="text-[var(--t-muted)]">·</span>
+                <span className="text-[9px] text-[var(--t-gilt)]" aria-hidden>
+                  ◆
+                </span>
                 <span className="text-[var(--t-muted)]">today {fmt(money.todaySpentUsd)}</span>
               </>
             )}
@@ -102,7 +106,7 @@ function Shell({ entry }: { entry: { tab?: TripTab; log?: boolean; checkin?: str
         )}
       </header>
 
-      <main className="mx-auto max-w-2xl px-4 pt-5" style={{ paddingBottom: "calc(var(--t-nav-h) + var(--safe-b) + 40px)" }}>
+      <main className="relative mx-auto max-w-2xl px-5 pt-6" style={{ paddingBottom: "calc(var(--t-nav-h) + var(--safe-b) + 48px)" }}>
         {tab === "today" && <TodayView onOpenMoney={() => go("money")} />}
         {tab === "plan" && <PlanView />}
         {tab === "money" && <MoneyView />}
@@ -116,8 +120,8 @@ function Shell({ entry }: { entry: { tab?: TripTab; log?: boolean; checkin?: str
           ))}
           <div className="flex items-center justify-center">
             <button type="button" onClick={() => openLog()} className="trip-fab flex h-14 w-14 -translate-y-3 flex-col items-center justify-center" aria-label="Log a spend">
-              <Plus size={26} weight="bold" />
-              <span className="text-[9px] font-bold tracking-widest uppercase">Log</span>
+              <Plus size={22} weight="light" />
+              <span className="text-[8px] font-semibold tracking-[0.25em] uppercase">Log</span>
             </button>
           </div>
           {TABS.slice(2).map((t) => (
@@ -128,7 +132,7 @@ function Shell({ entry }: { entry: { tab?: TripTab; log?: boolean; checkin?: str
 
       {toast && (
         <div className="trip-toast" role="status">
-          <div className={`flex items-center gap-3 px-4 py-3 text-sm ${toast.tone === "warn" ? "bg-[var(--t-coral)] text-white" : "bg-[var(--t-ink)] text-[var(--t-surface)]"}`}>
+          <div className={`flex items-center gap-3 px-4 py-3 text-sm ${toast.tone === "warn" ? "trip-toast-warn" : "trip-toast-body"}`}>
             <span className="min-w-0 flex-1">{toast.message}</span>
             {toast.undo && (
               <button
@@ -138,7 +142,7 @@ function Shell({ entry }: { entry: { tab?: TripTab; log?: boolean; checkin?: str
                   dismissToast();
                   await undo?.();
                 }}
-                className="shrink-0 font-bold underline underline-offset-2"
+                className="shrink-0 text-xs font-semibold tracking-[0.18em] text-[var(--t-gilt)] uppercase"
               >
                 Undo
               </button>
@@ -147,6 +151,7 @@ function Shell({ entry }: { entry: { tab?: TripTab; log?: boolean; checkin?: str
         </div>
       )}
 
+      <TripMenu open={menuOpen} onOpenChange={setMenuOpen} />
       <CheckinSheet />
       <QuickLogSheet />
     </div>
@@ -156,9 +161,9 @@ function Shell({ entry }: { entry: { tab?: TripTab; log?: boolean; checkin?: str
 function NavButton({ tab, active, onClick }: { tab: (typeof TABS)[number]; active: boolean; onClick: () => void }) {
   const Icon = tab.icon;
   return (
-    <button type="button" onClick={onClick} aria-current={active ? "page" : undefined} className="relative flex flex-col items-center justify-center gap-0.5 text-[var(--t-muted)]">
-      <Icon size={22} weight={active ? "fill" : "regular"} />
-      <span className="text-[11px] font-bold">{tab.label}</span>
+    <button type="button" onClick={onClick} aria-current={active ? "page" : undefined} className="relative flex flex-col items-center justify-center gap-1 text-[var(--t-muted)]">
+      <Icon size={21} weight={active ? "regular" : "light"} />
+      <span className="text-[10px] font-medium tracking-[0.14em] uppercase">{tab.label}</span>
     </button>
   );
 }

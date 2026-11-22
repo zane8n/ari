@@ -14,6 +14,8 @@ export type LogRequest = { budgetItemId?: string | null; day?: string | null; am
 
 type TripStore = {
   bundle: TripBundle;
+  /** Host (full control) vs a guest on a one-time pass (everything except managing access). */
+  isHost: boolean;
   api: TripApi;
   today: string;
   minutesNow: number;
@@ -75,7 +77,7 @@ function upsert<T extends { id: string }>(list: T[], row: T): T[] {
   return list.some((x) => x.id === row.id) ? list.map((x) => (x.id === row.id ? row : x)) : [...list, row];
 }
 
-export function TripProvider({ initial, children }: { initial: TripBundle; children: React.ReactNode }) {
+export function TripProvider({ initial, isHost, children }: { initial: TripBundle; isHost: boolean; children: React.ReactNode }) {
   const [bundle, setBundle] = useState(initial);
   const { trip } = bundle;
   const api = useMemo(() => createTripApi(trip.slug), [trip.slug]);
@@ -320,6 +322,7 @@ export function TripProvider({ initial, children }: { initial: TripBundle; child
 
   const value: TripStore = {
     bundle,
+    isHost,
     api,
     today: clock.today,
     minutesNow: clock.minutesNow,

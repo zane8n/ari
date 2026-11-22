@@ -41,25 +41,25 @@ function CheckinNudge({ overdue, dueToday }: { overdue: string[]; dueToday: bool
   const first = overdue[0];
   if (first) {
     return (
-      <button type="button" onClick={() => openCheckin(first)} className="flex w-full items-center gap-3 border-l-4 border-[var(--t-coral)] bg-[var(--t-coral-soft)] px-4 py-3 text-left">
+      <button type="button" onClick={() => openCheckin(first)} className="flex w-full items-center gap-3 border border-[rgb(227_140_118/0.45)] bg-[var(--t-coral-soft)] px-4 py-3 text-left">
         <span className="min-w-0 flex-1">
           <span className="block font-semibold text-[var(--t-coral)]">
             {overdue.length === 1 ? `${formatWeekday(first)} isn't closed yet` : `${overdue.length} days aren't closed yet`}
           </span>
           <span className="block text-sm text-[var(--t-ink)]">Two minutes: tick it off, settle the costs.</span>
         </span>
-        <span className="trip-btn trip-btn-ink !min-h-[40px] shrink-0">Catch up</span>
+        <span className="trip-btn trip-btn-primary !min-h-[40px] shrink-0">Catch up</span>
       </button>
     );
   }
   return (
-    <button type="button" onClick={() => openCheckin(today)} className="flex w-full items-center gap-3 bg-[var(--t-ink)] px-4 py-4 text-left text-[var(--t-surface)]">
-      <MoonStars size={28} weight="duotone" className="shrink-0" />
+    <button type="button" onClick={() => openCheckin(today)} className="trip-pass-card flex w-full items-center gap-3 px-5 py-5 text-left">
+      <MoonStars size={28} weight="light" className="shrink-0 text-[var(--t-sea)]" />
       <span className="min-w-0 flex-1">
-        <span className="font-display block text-xl leading-tight font-semibold">Evening check-in</span>
-        <span className="block text-sm opacity-80">Tick off today, log the spend, see what&apos;s left.</span>
+        <span className="font-display block text-xl leading-tight font-medium">Evening check-in</span>
+        <span className="block text-sm text-[var(--t-muted)]">Tick off today, log the spend, see what&apos;s left.</span>
       </span>
-      <span className="trip-btn !min-h-[40px] shrink-0 bg-[var(--t-surface)] text-[var(--t-ink)]">Start</span>
+      <span className="trip-btn trip-btn-primary !min-h-[40px] shrink-0">Start</span>
     </button>
   );
 }
@@ -107,7 +107,7 @@ export function DayAgenda({ day, showHeader = true }: { day: TripDay | null; sho
           <p className="trip-eyebrow">
             Day {index + 1} of {bundle.days.length} · {formatLongDay(day.date)}
           </p>
-          <h1 className="font-display text-[34px] leading-[1.05] font-semibold">{day.label}</h1>
+          <h1 className="font-display text-[34px] leading-[1.05] font-medium">{day.label}</h1>
           {day.mood && <p className="font-display text-lg text-[var(--t-muted)] italic">{day.mood}</p>}
           <DayFacts day={day} />
         </header>
@@ -152,7 +152,7 @@ function AgendaRow({ event, isNext, isLast }: { event: ItineraryEvent; isNext: b
         <button type="button" onClick={() => setExpanded(!expanded)} className="block w-full text-left" aria-expanded={expanded}>
           <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
             {event.timeOfDay && <span className="text-xs font-bold text-[var(--t-muted)] tabular-nums">{event.timeOfDay}</span>}
-            {isNext && <span className="trip-tag !bg-[var(--t-sea)] !text-white">Next</span>}
+            {isNext && <span className="trip-tag !border-transparent !bg-[var(--t-sea)] !text-[var(--t-on-accent)]">Next</span>}
             {event.isOptional && <span className="trip-tag">Optional</span>}
             {skipped && <span className="trip-tag !bg-[var(--t-coral-soft)] !text-[var(--t-coral)]">Skipped</span>}
           </span>
@@ -198,7 +198,7 @@ function BeforeTrip({ onOpenMoney }: { onOpenMoney: () => void }) {
     <>
       <header className="flex flex-col gap-1 pt-2">
         <p className="trip-eyebrow">{formatDateRange(trip.startDate, trip.endDate)}</p>
-        <h1 className="font-display text-[44px] leading-none font-semibold">
+        <h1 className="font-display text-[44px] leading-none font-medium">
           {daysToGo === 1 ? "Tomorrow." : `${daysToGo} days to go.`}
         </h1>
         <p className="text-[var(--t-muted)]">
@@ -292,7 +292,7 @@ function AfterTrip() {
     <>
       <header className="flex flex-col gap-1 pt-2">
         <p className="trip-eyebrow">{formatDateRange(bundle.trip.startDate, bundle.trip.endDate)}</p>
-        <h1 className="font-display text-[40px] leading-none font-semibold">That was {bundle.trip.destination}.</h1>
+        <h1 className="font-display text-[40px] leading-none font-medium">That was {bundle.trip.destination}.</h1>
       </header>
       <div className="trip-card flex flex-col gap-3 px-4 py-4">
         <p className="trip-eyebrow">Final tally</p>

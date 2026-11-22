@@ -27,7 +27,7 @@ export function PlanView() {
               onClick={() => setSelected(d.date)}
               aria-pressed={active}
               className={`flex min-w-[64px] shrink-0 flex-col items-center border px-2 py-2 ${
-                active ? "border-[var(--t-ink)] bg-[var(--t-ink)] text-[var(--t-surface)]" : "border-[var(--t-line-strong)] bg-[var(--t-surface)]"
+                active ? "border-[var(--t-sea)] bg-[var(--t-sea)] text-[var(--t-on-accent)]" : "border-[var(--t-line-strong)] bg-[var(--t-surface)]"
               }`}
             >
               <span className="text-[10px] font-bold tracking-widest uppercase opacity-75">{d.date === today ? "Today" : `Day ${i + 1}`}</span>
@@ -171,7 +171,7 @@ function EditableEvent({ event }: { event: ItineraryEvent }) {
         </select>
         {confirmDelete ? (
           <>
-            <button type="button" onClick={() => removeEvent(event.id)} className="trip-btn !min-h-[36px] !px-3 bg-[var(--t-coral)] text-xs text-white">
+            <button type="button" onClick={() => removeEvent(event.id)} className="trip-btn !min-h-[36px] !px-3 trip-btn-warn text-xs">
               Delete it
             </button>
             <button type="button" onClick={() => setConfirmDelete(false)} className="trip-btn trip-btn-quiet !min-h-[36px] text-xs">
