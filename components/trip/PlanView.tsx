@@ -41,10 +41,10 @@ export function PlanView() {
                 setSelected(d.date);
                 setEditing(false);
               }}
-              className={`relative flex w-[132px] shrink-0 flex-col items-start gap-1 rounded-[22px] p-4 text-left transition-[transform,box-shadow] duration-300 ${
-                active ? "-translate-y-0.5 shadow-[var(--t-shadow-lg)]" : "bg-white/60 shadow-[var(--t-shadow-sm)]"
+              className={`relative flex w-[128px] shrink-0 flex-col items-start gap-1 p-4 text-left transition-[transform,box-shadow] duration-500 ${
+                active ? "trip-card -translate-y-0.5" : "trip-soft"
               }`}
-              style={active ? { background: "linear-gradient(150deg, var(--t-wash), #fff 75%)" } : undefined}
+              style={active ? { boxShadow: "var(--t-shadow), inset 0 2px 0 var(--t-sea)" } : undefined}
             >
               <span className="text-xs text-[var(--t-muted)]">{d.date === today ? "Today" : `Day ${i + 1}`}</span>
               <span className="trip-num text-[30px] leading-none">{formatWeekday(d.date)}</span>
@@ -64,7 +64,7 @@ export function PlanView() {
           <m.div key={day.date + (editing ? "-edit" : "")} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease }} className="flex flex-col gap-6">
             <div className="flex items-end justify-between gap-3">
               <div className="min-w-0">
-                <h2 className="font-display text-[32px] leading-tight font-medium">{day.label}</h2>
+                <h2 className="font-display text-[32px] leading-tight font-medium italic">{day.label}</h2>
                 {day.mood && <p className="font-display mt-1 text-[17px] text-[var(--t-muted)] italic">{day.mood}</p>}
               </div>
               <button type="button" onClick={() => setEditing(!editing)} aria-pressed={editing} className="trip-chip !min-h-[38px] shrink-0 !text-[13px]">

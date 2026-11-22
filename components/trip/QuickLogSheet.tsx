@@ -226,7 +226,7 @@ function QuickLogBody({ logRequest }: { logRequest: LogRequest }) {
             </label>
           </div>
           {fund === "reserve" && (
-            <p className="mt-3 rounded-2xl bg-[var(--t-coral-soft)] px-4 py-3 text-xs text-[var(--t-coral)]">The reserve is for emergencies, not treats. It&apos;s kept apart from the pot.</p>
+            <p className="mt-3 bg-[var(--t-coral-soft)] px-4 py-3 text-xs text-[var(--t-coral)]">The reserve is for emergencies, not treats. It&apos;s kept apart from the pot.</p>
           )}
         </Reveal>
       </form>

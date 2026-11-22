@@ -11,6 +11,17 @@ import { tripThemeVars } from "@/lib/trip/theme";
 import { useTrip } from "./TripContext";
 
 export const ease = FLUID_EASE;
+/** The letter's own entrance curve — slower and calmer than the app default. */
+export const calm = [0.22, 0.8, 0.3, 1] as const;
+
+/** ── ◆ ── the letter's fleuron, the only divider the trip uses. */
+export function Fleuron({ className = "" }: { className?: string }) {
+  return (
+    <div className={`trip-fleuron ${className}`} aria-hidden>
+      <i />
+    </div>
+  );
+}
 
 /** Sheets render in a portal outside the trip root, so they carry this device's palette themselves. */
 export function Sheet({
@@ -36,10 +47,10 @@ export function Sheet({
         <Dialog.Content className="trip trip-sheet" style={{ minHeight: 0, ...(tripThemeVars(themeId) as React.CSSProperties) }}>
           <div className="flex items-start justify-between gap-3 px-6 pt-4 pb-3">
             <div className="min-w-0">
-              <Dialog.Title className="font-display text-[28px] leading-tight font-medium">{title}</Dialog.Title>
+              <Dialog.Title className="font-display text-[30px] leading-tight font-medium italic">{title}</Dialog.Title>
               <Dialog.Description className={description ? "mt-0.5 text-sm text-[var(--t-muted)]" : "sr-only"}>{description ?? title}</Dialog.Description>
             </div>
-            <Dialog.Close className="trip-btn trip-btn-ghost -mr-2 !min-h-[40px] !w-10 shrink-0 !p-0" aria-label="Close">
+            <Dialog.Close className="trip-btn trip-btn-quiet -mr-3 !min-h-[44px] !w-11 shrink-0 !p-0" aria-label="Close">
               <X size={18} />
             </Dialog.Close>
           </div>
@@ -66,7 +77,7 @@ export function SectionTitle({ eyebrow, title, action }: { eyebrow?: string; tit
 /** Content that eases in as it appears — the one entrance every screen shares. */
 export function Rise({ children, delay = 0, className }: { children: React.ReactNode; delay?: number; className?: string }) {
   return (
-    <m.div className={className} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease, delay }}>
+    <m.div className={className} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.62, ease: calm, delay }}>
       {children}
     </m.div>
   );
@@ -113,7 +124,7 @@ export function CountUp({ value, format }: { value: number; format: (v: number) 
 
 /** The pot as a soft ring: spent (solid) → still planned (tint). Over-budget spills in coral. */
 export function PotRing({ money, size = 220, children }: { money: MoneySummary; size?: number; children?: React.ReactNode }) {
-  const stroke = 14;
+  const stroke = 3;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const scale = Math.max(money.potUsd, money.forecastUsd, 1);
@@ -129,18 +140,19 @@ export function PotRing({ money, size = 220, children }: { money: MoneySummary; 
       fill="none"
       stroke={color}
       strokeWidth={stroke}
-      strokeLinecap="round"
+      strokeLinecap="butt"
       transform={`rotate(-90 ${size / 2} ${size / 2})`}
       initial={{ strokeDasharray: `0 ${c}` }}
-      animate={{ strokeDasharray: `${Math.max(0, fraction * c - (fraction > 0.02 ? 6 : 0))} ${c}`, strokeDashoffset: -offset * c }}
-      transition={{ duration: 1, ease }}
+      animate={{ strokeDasharray: `${Math.max(0, fraction * c)} ${c}`, strokeDashoffset: -offset * c }}
+      transition={{ duration: 1.2, ease: calm }}
     />
   );
   return (
     <div className="relative mx-auto" style={{ width: size, height: size }}>
       <svg width={size} height={size} role="img" aria-label={`${Math.round((money.spentUsd / Math.max(1, money.potUsd)) * 100)}% of the pot spent`}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--t-sunk)" strokeWidth={stroke} />
-        {planned > 0.005 && arc(planned, spent, over ? "var(--t-coral)" : "color-mix(in srgb, var(--t-sea) 30%, transparent)", "planned")}
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgb(184 144 76 / 0.35)" strokeWidth={1} />
+        <circle cx={size / 2} cy={size / 2} r={r - 10} fill="none" stroke="rgb(184 144 76 / 0.18)" strokeWidth={1} />
+        {planned > 0.005 && arc(planned, spent, over ? "var(--t-coral)" : "color-mix(in srgb, var(--t-sea) 28%, transparent)", "planned")}
         {spent > 0.005 && arc(spent, 0, "var(--t-sea)", "spent")}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">{children}</div>
@@ -183,7 +195,7 @@ export function CheckButton({ checked, onClick, label }: { checked: boolean; onC
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
-          strokeLinecap="round"
+          strokeLinecap="butt"
           strokeLinejoin="round"
           initial={false}
           animate={{ pathLength: checked ? 1 : 0 }}
@@ -225,17 +237,17 @@ export function ThemePicker({ value, onChange }: { value: ThemeId; onChange: (id
               aria-checked={active}
               aria-label={theme.displayName}
               onClick={() => onChange(theme.id)}
-              className="relative mx-auto flex h-11 w-11 items-center justify-center rounded-full transition-transform active:scale-90"
-              style={{ background: `radial-gradient(circle at 30% 30%, ${theme.tokens.accentSoft}, ${theme.accent})` }}
+              className="relative mx-auto flex h-10 w-10 items-center justify-center rounded-full transition-transform active:scale-95"
+              style={{ background: theme.accent, boxShadow: "inset 0 0 0 1px rgb(255 255 255 / 0.45), 0 0 0 1px rgb(184 144 76 / 0.35)" }}
             >
-              {active && <m.span layoutId="theme-ring" className="absolute -inset-1 rounded-full border-2" style={{ borderColor: theme.tokens.accentStrong }} transition={{ duration: 0.35, ease }} />}
+              {active && <m.span layoutId="theme-ring" className="absolute -inset-[5px] rounded-full border" style={{ borderColor: "var(--t-gilt)" }} transition={{ duration: 0.4, ease: calm }} />}
             </button>
           );
         })}
       </div>
       {current && (
         <p className="mt-3 text-center text-sm">
-          <span className="font-display text-lg font-medium">{current.displayName}</span>
+          <span className="font-display text-lg font-medium italic">{current.displayName}</span>
           <span className="text-[var(--t-muted)]"> · {current.character}</span>
         </p>
       )}

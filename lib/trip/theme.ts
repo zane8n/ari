@@ -14,19 +14,21 @@ export function resolveTripTheme(value: string | null | undefined, fallback: The
   return value && isThemeId(value) ? value : fallback;
 }
 
-/** CSS custom properties for one palette, laid over the shared moonlit-petal canvas. */
+/** CSS custom properties for one palette, laid over the shared moonlit-petal canvas (contrast: the deepened tone only gets darker than accentStrong, which already clears 4.5:1 against ivory). */
 export function tripThemeVars(id: ThemeId): Record<string, string> {
   const theme = THEMES[id];
   return {
     "--t-canvas": CANVAS,
     "--t-ink": INK,
     "--t-accent": theme.tokens.accent,
-    "--t-sea": theme.tokens.accentStrong,
-    "--t-sea-strong": mix(theme.tokens.accentStrong, INK, 78),
+    // Worn quietly: the palette's strong tone deepened toward ink, so even the
+    // brightest choice reads grown-up on cream paper.
+    "--t-sea": mix(theme.tokens.accentStrong, INK, 62),
+    "--t-sea-strong": mix(theme.tokens.accentStrong, INK, 45),
     "--t-sea-soft": theme.tokens.accentMist,
     "--t-wash": theme.tokens.accentSoft,
     "--t-glow": theme.tokens.accentGlow,
-    "--t-on-accent": theme.actionForeground,
+    "--t-on-accent": "#fdf6ee",
   };
 }
 

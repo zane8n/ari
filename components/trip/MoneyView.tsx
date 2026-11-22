@@ -9,7 +9,7 @@ import { formatDayMonth, formatWeekday } from "@/lib/trip/dates";
 import type { ItemMoney } from "@/lib/trip/money";
 import { AnimatePresence, m } from "@/lib/motion/m";
 import { useTrip } from "./TripContext";
-import { CountUp, ease, PotRing, Reveal, Rise, SectionTitle, Stat } from "./ui";
+import { CountUp, ease, Fleuron, PotRing, Reveal, Rise, SectionTitle, Stat } from "./ui";
 
 type MoneyTab = "overview" | "budget" | "payments";
 const MONEY_TABS: { id: MoneyTab; label: string }[] = [
@@ -26,7 +26,7 @@ export function MoneyView() {
   return (
     <div className="flex flex-col gap-8 pt-4">
       <Rise className="flex flex-col items-center gap-5">
-        <PotRing money={money} size={232}>
+        <PotRing money={money} size={240}>
           <p className="trip-eyebrow">Left in our pot</p>
           <p className="trip-num mt-1 text-[40px] leading-none">
             <CountUp value={money.leftUsd} format={fmt} />
@@ -42,6 +42,8 @@ export function MoneyView() {
         </p>
       </Rise>
 
+      <Fleuron />
+
       <Rise delay={0.08} className="grid grid-cols-3 gap-2">
         <Stat label="Spent" value={fmt(money.spentUsd)} />
         <Stat label="Still planned" value={fmt(money.stillExpectedUsd)} />
@@ -52,7 +54,7 @@ export function MoneyView() {
         <div className="trip-seg" role="tablist" aria-label="Money sections">
           {MONEY_TABS.map((t) => (
             <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)}>
-              {tab === t.id && <m.span layoutId="money-tab" className="trip-seg-pill" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
+              {tab === t.id && <m.span layoutId="money-tab" className="trip-seg-pill" transition={{ duration: 0.4, ease }} />}
               {t.label}
             </button>
           ))}
