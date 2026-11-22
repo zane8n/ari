@@ -697,3 +697,327 @@ h3 {
     transform: none;
   }
 }
+
+/*
+ * Trip tracker — "coast" palette. Scoped to .trip so it never leaks into
+ * the invitation experience. Sand canvas, deep-sea ink, lagoon teal for
+ * action, coral strictly for warnings. Flat, square geometry to match the
+ * rest of the site; numbers set in the display serif.
+ */
+.trip {
+  --t-canvas: #f4efe4;
+  --t-surface: #fffdf7;
+  --t-sunk: #ebe4d4;
+  --t-ink: #10262e;
+  --t-muted: #56676b;
+  --t-line: rgb(16 38 46 / 0.13);
+  --t-line-strong: rgb(16 38 46 / 0.28);
+  --t-sea: #0f6e74;
+  --t-sea-strong: #0a5257;
+  --t-sea-soft: #d7e9e6;
+  --t-coral: #b8442c;
+  --t-coral-soft: #f6dcd3;
+  --t-sun: #b77d14;
+  --t-sun-soft: #f5e6c4;
+  --t-good: #2b7a4b;
+  --t-good-soft: #d9ecdf;
+  --t-gilt: #a8823d;
+  --t-nav-h: 64px;
+
+  min-height: 100svh;
+  background: var(--t-canvas);
+  color: var(--t-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.trip h1,
+.trip h2,
+.trip h3 {
+  color: var(--t-ink);
+}
+
+.trip-num {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.trip-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t-muted);
+}
+
+.trip-card {
+  background: var(--t-surface);
+  border: 1px solid var(--t-line);
+}
+
+.trip-btn {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 120ms ease;
+}
+
+.trip-btn:active {
+  transform: scale(0.98);
+}
+
+.trip-btn:disabled {
+  opacity: 0.5;
+}
+
+.trip-btn-primary {
+  background: var(--t-sea);
+  color: #fff;
+}
+
+.trip-btn-primary:hover {
+  background: var(--t-sea-strong);
+}
+
+.trip-btn-ink {
+  background: var(--t-ink);
+  color: var(--t-surface);
+}
+
+.trip-btn-ghost {
+  background: transparent;
+  color: var(--t-ink);
+  border-color: var(--t-line-strong);
+}
+
+.trip-btn-ghost:hover {
+  background: var(--t-sunk);
+}
+
+.trip-btn-quiet {
+  background: transparent;
+  color: var(--t-muted);
+  padding: 0 10px;
+}
+
+.trip-btn-quiet:hover {
+  color: var(--t-ink);
+}
+
+.trip-chip {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--t-surface);
+  border: 1px solid var(--t-line-strong);
+  color: var(--t-ink);
+  text-align: left;
+}
+
+.trip-chip[aria-pressed="true"] {
+  background: var(--t-ink);
+  border-color: var(--t-ink);
+  color: var(--t-surface);
+}
+
+.trip-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: var(--t-sunk);
+  color: var(--t-muted);
+}
+
+.trip-input {
+  min-height: 46px;
+  width: 100%;
+  padding: 0 12px;
+  font-size: 16px;
+  background: var(--t-surface);
+  border: 1px solid var(--t-line-strong);
+  color: var(--t-ink);
+  outline: none;
+}
+
+.trip-input:focus {
+  border-color: var(--t-sea);
+  box-shadow: 0 0 0 3px rgb(15 110 116 / 0.15);
+}
+
+textarea.trip-input {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.trip :focus-visible {
+  outline: 2px solid var(--t-sea);
+  outline-offset: 2px;
+}
+
+/* Bottom navigation — thumb-reach, safe-area aware. */
+.trip-nav {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 40;
+  background: rgb(255 253 247 / 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--t-line);
+  padding-bottom: var(--safe-b);
+}
+
+.trip-nav button[aria-current="page"] {
+  color: var(--t-sea);
+}
+
+.trip-nav button[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 30%;
+  right: 30%;
+  height: 2px;
+  background: var(--t-sea);
+}
+
+.trip-fab {
+  background: var(--t-sea);
+  color: #fff;
+  box-shadow: 0 8px 24px -8px rgb(15 110 116 / 0.6);
+}
+
+/* Bottom sheet */
+.trip-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgb(16 38 46 / 0.42);
+  animation: trip-fade 160ms ease-out both;
+}
+
+.trip-sheet {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 51;
+  margin: 0 auto;
+  display: flex;
+  max-height: 92svh;
+  max-width: 560px;
+  flex-direction: column;
+  background: var(--t-canvas);
+  color: var(--t-ink);
+  border-top: 3px solid var(--t-sea);
+  padding-bottom: var(--safe-b);
+  animation: trip-rise 220ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+
+@media (min-width: 640px) {
+  .trip-sheet {
+    inset: auto 0 24px 0;
+    border: 1px solid var(--t-line);
+    border-top: 3px solid var(--t-sea);
+  }
+}
+
+@keyframes trip-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes trip-rise {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
+
+/* Pot bar: spent · still expected · free (or over). */
+.trip-bar {
+  display: flex;
+  height: 10px;
+  width: 100%;
+  overflow: hidden;
+  background: var(--t-sunk);
+}
+
+.trip-bar > span {
+  height: 100%;
+}
+
+.trip-hatch {
+  background-image: repeating-linear-gradient(-45deg, var(--t-sea) 0 3px, var(--t-sea-soft) 3px 6px);
+}
+
+.trip-check {
+  display: inline-flex;
+  height: 32px;
+  width: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--t-line-strong);
+  border-radius: 999px;
+  background: var(--t-surface);
+  color: transparent;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.trip-check[aria-checked="true"] {
+  background: var(--t-good);
+  border-color: var(--t-good);
+  color: #fff;
+}
+
+.trip-surprise {
+  background:
+    linear-gradient(135deg, rgb(168 130 61 / 0.14), transparent 60%),
+    var(--t-surface);
+  border: 1px solid rgb(168 130 61 / 0.45);
+}
+
+.trip-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--t-nav-h) + var(--safe-b) + 16px);
+  z-index: 60;
+  width: min(520px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  animation: trip-rise 200ms ease-out both;
+}
+
+.trip-scroll-x {
+  scrollbar-width: none;
+}
+
+.trip-scroll-x::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trip-sheet,
+  .trip-sheet-overlay,
+  .trip-toast {
+    animation: none;
+  }
+}

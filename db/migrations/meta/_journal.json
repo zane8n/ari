@@ -29,6 +29,20 @@
       "when": 1794737215082,
       "tag": "0003_outstanding_ink",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795309172844,
+      "tag": "0004_multi_trip",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795309178269,
+      "tag": "0005_drop_legacy_actuals",
+      "breakpoints": true
     }
   ]
 }

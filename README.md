@@ -145,6 +145,43 @@ answers, reconstructed signature, and a link to its generated invitation
 image. Log in by POSTing `{ "password": "..." }` to `/api/host/session`
 (the login form does this for you).
 
+## Trip tracker
+
+`/host/trip/<slug>` is a private, per-trip tracker behind the same host
+session (`/host/trip` lists every trip and jumps straight to the only live
+one). Each trip has its own entry points:
+
+| URL | Opens |
+|---|---|
+| `/host/trip/<slug>` | Today: countdown + prep checklist before the trip, the day's timeline during it, a memories recap after |
+| `?log=1` | Straight into the quick log (also the home-screen shortcut) |
+| `?checkin=YYYY-MM-DD` | That day's evening check-in (the calendar reminders link here) |
+| `?tab=plan\|money\|insights` | A specific tab |
+| `/api/host/trips/<slug>/reminders.ics` | A calendar of nightly check-in nudges + dated prep tasks (no itinerary details) |
+
+**Money model** (`lib/trip/money.ts`, unit-tested): a shared **pot**; every
+real payment is an **expense** (many per budget line, USD frozen at log
+time); budget lines are **fixed** one-offs (closed once paid) or **running**
+pots (tuk-tuks, snacks). *Forecast* = spent + what open lines still expect;
+*headroom* = pot − forecast, spread over the days left as a daily "free for
+extras" figure. If the forecast exceeds the pot, the **cut list** (each line's
+`cut_rank`) applies in the agreed order. The **emergency reserve** is tracked
+apart and never absorbs overruns. Skipping an activity frees its unpaid cost.
+
+**Adding a trip** (real content is gitignored — this repo is public):
+
+```bash
+cp content/trips/example.ts content/trips/<slug>.local.ts   # fill in the real plan
+pnpm db:migrate
+pnpm seed:trip <slug>
+```
+
+Migration `0004` turns the old single-trip data into a legacy `arusha` trip
+(its pot/reserve fall back to `TRIP_CASH_BUDGET_USD` /
+`TRIP_RESERVE_BUDGET_USD`) and converts its logged actuals into expenses;
+`0005` then drops the old `actual_*` columns. **Run `pnpm db:migrate` before
+deploying this code**, or the tracker will query columns that don't exist yet.
+
 ## Project structure
 
 ```

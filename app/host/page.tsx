@@ -1,5 +1,6 @@
 import { desc } from "drizzle-orm";
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { DeleteInviteButton } from "@/components/host/DeleteInviteButton";
 import { HostLoginForm } from "@/components/host/HostLoginForm";
 import { experienceCopy } from "@/content/experience-copy";
@@ -36,9 +37,9 @@ export default async function HostPage() {
     <main className="mx-auto flex min-h-[100svh] max-w-2xl flex-col gap-6 px-5 py-10">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-2xl text-ink">Host view</h1>
-        <a href="/host/trip" className="text-sm font-medium text-accent-strong underline">
+        <Link href="/host/trip" className="text-sm font-medium text-accent-strong underline">
           Trip tracker →
-        </a>
+        </Link>
       </div>
       {letterStatuses.map((letter) => (
         <section key={letter.id} className="aura-panel-solid flex flex-col gap-3 px-6 py-6">

@@ -1,54 +1,65 @@
 import "server-only";
-import type { BudgetItem, ItineraryEvent, TripDay } from "@/db/schema";
 import { analyzeTrip } from "@/lib/trip/analysis";
-import { serializeBudgetItem } from "@/lib/server/trip";
+import { todayInZone } from "@/lib/trip/dates";
+import type { TripBundle } from "@/lib/trip/types";
+
+const usd = (value: number) => `$${value.toFixed(2)}`;
 
 /** Builds the system prompt fresh from the live database on every request — never cached, never client-supplied. */
-export function buildCoachSystemPrompt(params: {
-  budgetItemRows: BudgetItem[];
-  events: ItineraryEvent[];
-  tripDays: TripDay[];
-  meta: { destination: string; homeBase: string; cashBudgetUsd: number; reserveBudgetUsd: number };
-}): string {
-  const budgetItems = params.budgetItemRows.map(serializeBudgetItem);
-  const analysis = analyzeTrip(budgetItems, params.events, params.tripDays, params.meta);
+export function buildCoachSystemPrompt(bundle: TripBundle): string {
+  const { trip } = bundle;
+  const today = todayInZone(trip.timezone);
+  const analysis = analyzeTrip({ ...bundle, today });
+  const m = analysis.money;
 
-  return `You are the trip analyst for a couple's real vacation to ${params.meta.destination}, staying at ${params.meta.homeBase}. You are deliberately thorough and a little over-the-top about it — this whole "command center" was requested as intentionally overkill, so lean into being a sharp, slightly enthusiastic analyst rather than a dry assistant. Still: be genuinely useful, specific, and concise per answer. Never invent numbers — every figure you cite must come from the data below.
+  const rules = trip.rules.length > 0 ? `\n## The couple's own money rules\n${trip.rules.map((r) => `- ${r}`).join("\n")}\n` : "";
 
-## Current trip data snapshot (live, computed just now)
+  return `You are the trip analyst for a couple's real vacation to ${trip.destination}${trip.homeBase ? `, staying at ${trip.homeBase}` : ""}, ${trip.startDate} to ${trip.endDate}. Today (local, ${trip.timezone}) is ${today}. Be a sharp, slightly enthusiastic analyst: genuinely useful, specific and concise. Never invent numbers — every figure you cite must come from the data below. Surprise events are sealed on purpose: never speculate about what they are.
 
-Cash budget (configured): $${analysis.cashBudgetUsd} — total planned (estimated): $${analysis.totalEstimatedUsd.toFixed(2)} — remaining to spend of the plan: $${analysis.cashRemainingUsd.toFixed(2)}
-Reserve budget (a margin that absorbs cost overruns — items that ran over their own estimate, not net of savings elsewhere): $${analysis.reserveBudgetUsd} — remaining after overruns: $${analysis.reserveRemainingUsd.toFixed(2)}
-Logged so far: ${analysis.loggedItemCount}/${analysis.totalItemCount} budget items, totaling $${analysis.totalActualLoggedUsd.toFixed(2)}
-Budget adherence (of items logged): ${analysis.budgetAdherencePct !== null ? `${analysis.budgetAdherencePct.toFixed(0)}%` : "nothing logged yet"}
-Itinerary completion: ${analysis.itineraryCompletionPct.toFixed(0)}% (${analysis.eventStatusCounts.map((s) => `${s.count} ${s.label.toLowerCase()}`).join(", ")})
-Composite "trip health score" (your own invented metric, half budget adherence + half itinerary completion): ${analysis.healthScore}/100
+## Money model
+- Pot (shared budget): ${usd(m.potUsd)}. Spent from the pot: ${usd(m.spentUsd)}. Left in the pot: ${usd(m.leftUsd)}.
+- Still expected (open plan lines not yet paid): ${usd(m.stillExpectedUsd)}. Forecast landing: ${usd(m.forecastUsd)}.
+- Headroom (pot − forecast): ${usd(m.headroomUsd)} → ${m.headroomUsd >= 0 ? `${usd(m.extrasPerDayUsd)} per day free for extras over ${m.daysLeft} day(s) left` : "OVER the pot — the cut list applies"}.
+- Freed by skipped/dropped plans: ${usd(m.freedUsd)}. Unplanned spending so far: ${usd(m.unplannedSpentUsd)}.
+- Emergency reserve (outside the pot, not for optional extras): ${usd(m.reserveUsd)}, used ${usd(m.reserveSpentUsd)}.
+${rules}
+## Cut list (agreed order, only lines not yet paid)
+${m.cutPlan.length > 0 ? m.cutPlan.map((c) => `- ${c.item.label}: saves ${usd(c.savingUsd)}${c.note ? ` (${c.note})` : ""}`).join("\n") : "None defined."}
 
-### Category breakdown (estimated vs actual, USD)
-${analysis.categoryBreakdown.map((c) => `- ${c.label}: planned $${c.estimatedUsd.toFixed(2)}, actual $${c.actualUsd.toFixed(2)}`).join("\n")}
+## Habits
+Payments logged: ${analysis.loggedExpenseCount}. Evening check-ins done: ${analysis.checkinsDone}, current streak ${analysis.checkinStreak}. Itinerary completion: ${analysis.itineraryCompletionPct.toFixed(0)}% (${analysis.eventStatusCounts.map((s) => `${s.count} ${s.label.toLowerCase()}`).join(", ")}). Composite "trip health score" (invented, deployed with confidence): ${analysis.healthScore}/100.
 
-### Day-by-day (estimated vs actual, USD; items logged / total items that day)
-${analysis.daySpend.map((d) => `- ${d.date} — ${d.label}: planned $${d.estimatedUsd.toFixed(2)}, actual $${d.actualUsd.toFixed(2)} (${d.loggedCount}/${d.itemCount} logged)`).join("\n")}
+### By category (planned vs spent)
+${m.byCategory.map((c) => `- ${c.category}: planned ${usd(c.plannedUsd)}, spent ${usd(c.spentUsd)}, still expected ${usd(c.stillExpectedUsd)}`).join("\n")}
 
-### Biggest variances (logged items furthest from their estimate)
-${analysis.variances.length > 0 ? analysis.variances.slice(0, 8).map((v) => `- ${v.label}: est $${v.estimatedUsd.toFixed(2)}, actual $${v.actualUsd.toFixed(2)} (${v.varianceUsd > 0 ? "+" : ""}${v.varianceUsd.toFixed(2)})`).join("\n") : "None logged yet."}
+### By day (planned vs spent)
+${analysis.daySpend.map((d) => `- ${d.date} — ${d.label}: planned ${usd(d.estimatedUsd)}, spent ${usd(d.actualUsd)} across ${d.loggedCount} payment(s)`).join("\n")}
 
-### Currency mix of what's been paid
-${analysis.currencyMix.length > 0 ? analysis.currencyMix.map((c) => `- ${c.currency}: $${c.usdEquivalent.toFixed(2)} equivalent across ${c.count} item(s)`).join("\n") : "Nothing logged yet."}
-
-## Full raw itinerary (${params.events.length} activities)
-${params.events
-  .map((e) => `- [${e.day}] ${e.timeOfDay ?? ""} "${e.title}" — status: ${e.status}${e.description ? ` — ${e.description}` : ""}${e.location ? ` @ ${e.location}` : ""}${e.originalDay ? ` (rescheduled from ${e.originalDay})` : ""}`)
-  .join("\n")}
-
-## Full raw budget items (${budgetItems.length} lines)
-${budgetItems
+### Budget lines
+${m.items
   .map(
-    (b) =>
-      `- [${b.day ?? "unscheduled"}] ${b.category} "${b.label}" — est $${b.estimatedUsd.toFixed(2)}${b.actualUsd !== null ? `, actual $${b.actualUsd.toFixed(2)}` : ", not logged"}${b.isReserve ? " (reserve)" : ""}`,
+    (x) =>
+      `- [${x.item.day ?? "any day"}] ${x.item.kind} ${x.item.category} "${x.item.label}" — est ${usd(x.item.estimatedUsd)}, paid ${usd(x.paidUsd)}, status ${x.item.status}${x.item.isReserve ? " (reserve)" : ""}`,
   )
   .join("\n")}
 
+### Itinerary (${bundle.events.length} activities)
+${bundle.events
+  .map((e) =>
+    e.isSurprise
+      ? `- [${e.day}] ${e.timeOfDay ?? ""} (sealed surprise) — status: ${e.status}`
+      : `- [${e.day}] ${e.timeOfDay ?? ""} "${e.title}" — status: ${e.status}${e.isOptional ? " (optional)" : ""}${e.location ? ` @ ${e.location}` : ""}${e.originalDay ? ` (moved from ${e.originalDay})` : ""}`,
+  )
+  .join("\n")}
+
+### Recent payments
+${
+  bundle.expenses
+    .slice(-25)
+    .map((e) => `- ${e.day ?? "?"} ${e.label}: ${e.amount} ${e.currency} (${usd(e.amountUsd)}, ${e.fund})`)
+    .join("\n") || "None yet."
+}
+
 ## Your job
-Answer questions about this trip's budget and itinerary conversationally. When asked for suggestions, be specific and reference actual numbers/items above — never generic travel advice. Point out real patterns: categories running hot or cold, days that are unusually packed or empty, items that came in wildly over/under estimate, activities still "planned" on days that have already passed relative to today's date if that's inferable, imbalances in the itinerary (e.g. too much/little downtime). If asked what to add or remove, ground it in what's actually there — don't invent new destinations or activities unrelated to this itinerary. Keep responses focused — a few sentences to a short paragraph, using specific numbers, not walls of text. It's fine to have a bit of personality, but substance always comes first.`;
+Answer questions about this trip's money and plan conversationally. Ground every suggestion in the data — reference real lines, days and numbers; never generic travel advice. If the forecast is over the pot, recommend cuts strictly in the cut-list order above. Never suggest dipping into the reserve for optional activities. Keep answers to a few sentences or a short paragraph.`;
 }
