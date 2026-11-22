@@ -87,8 +87,8 @@ function Shell({ entry }: { entry: { tab?: TripTab; log?: boolean; checkin?: str
             {trip.name.slice(0, 1)}
           </button>
           <div className="min-w-0 flex-1">
-            <p className="font-display truncate text-[22px] leading-tight font-medium">{trip.name}</p>
-            <p className="truncate text-xs text-[var(--t-muted)]">{status}</p>
+            <p className="font-display truncate text-[22px] leading-tight font-medium italic">{trip.name}</p>
+            <p className="trip-eyebrow truncate !text-[0.6rem]">{status}</p>
           </div>
         </div>
       </header>
@@ -110,8 +110,8 @@ function Shell({ entry }: { entry: { tab?: TripTab; log?: boolean; checkin?: str
             <NavButton key={t.id} tab={t} active={tab === t.id} onClick={() => go(t.id)} />
           ))}
           <div className="flex items-center justify-center">
-            <button type="button" onClick={() => openLog()} className="trip-fab flex h-14 w-14 -translate-y-4 items-center justify-center" aria-label="Log a spend">
-              <Plus size={26} weight="bold" />
+            <button type="button" onClick={() => openLog()} className="trip-fab flex h-11 w-11 -translate-y-3 items-center justify-center" aria-label="Log a spend">
+              <Plus size={20} weight="regular" />
             </button>
           </div>
           {TABS.slice(2).map((t) => (
@@ -167,9 +167,9 @@ function NavButton({ tab, active, onClick }: { tab: (typeof TABS)[number]; activ
       aria-current={active ? "page" : undefined}
       className="relative z-0 flex h-full flex-col items-center justify-center gap-0.5 text-[var(--t-muted)] transition-colors"
     >
-      {active && <m.span layoutId="nav-pill" className="trip-nav-pill" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
+      {active && <m.span layoutId="nav-pill" className="trip-nav-pill" transition={{ duration: 0.45, ease }} />}
       <Icon size={21} weight={active ? "fill" : "regular"} />
-      <span className="text-[11px] font-medium">{tab.label}</span>
+      <span className="text-[0.6rem] font-semibold tracking-[0.16em] uppercase">{tab.label}</span>
     </button>
   );
 }

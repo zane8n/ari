@@ -7,7 +7,7 @@ import { AnimatePresence, m } from "@/lib/motion/m";
 import { daysBetween, formatDateRange, formatDayMonth, formatLongDay, formatWeekday, parseStartMinutes, tripPhase } from "@/lib/trip/dates";
 import { pendingCheckins } from "@/lib/trip/money";
 import { useTrip } from "./TripContext";
-import { CheckButton, ContactLinks, CountUp, ease, PotBar, PotRing, Reveal, Rise } from "./ui";
+import { CheckButton, ContactLinks, CountUp, ease, Fleuron, PotBar, PotRing, Reveal, Rise } from "./ui";
 
 export function TodayView({ onOpenMoney, onOpenPlan }: { onOpenMoney: () => void; onOpenPlan: () => void }) {
   const { bundle, today } = useTrip();
@@ -29,12 +29,14 @@ function BeforeTrip({ onOpenMoney, onOpenPlan }: { onOpenMoney: () => void; onOp
     <div className="flex flex-col gap-8 pt-6">
       <Rise className="text-center">
         <p className="trip-eyebrow">{formatDateRange(trip.startDate, trip.endDate)}</p>
-        <p className="trip-num mt-3 text-[96px] leading-[0.85] text-[var(--t-sea)]">{daysToGo}</p>
-        <p className="font-display mt-2 text-2xl">
+        <p className="trip-num mt-4 text-[88px] leading-[0.85] text-[var(--t-sea)]">{daysToGo}</p>
+        <p className="font-display mt-3 text-2xl italic">
           {daysToGo === 1 ? "day until" : "days until"} {trip.destination}
         </p>
         {trip.homeBase && <p className="mt-1 text-sm text-[var(--t-muted)]">{trip.homeBase}</p>}
       </Rise>
+
+      <Fleuron />
 
       <Rise delay={0.08}>
         <PrepCard />
@@ -79,14 +81,14 @@ function PrepCard() {
   const next = open[0];
 
   return (
-    <section className="trip-card p-6">
+    <section className="trip-card p-7">
       <div className="flex items-center justify-between">
         <p className="trip-eyebrow">Before we go</p>
         <p className="text-xs text-[var(--t-muted)]">
           {done} of {prep.length}
         </p>
       </div>
-      <div className="trip-bar mt-3 !h-1.5">
+      <div className="trip-bar mt-3">
         <m.span initial={{ width: 0 }} animate={{ width: `${(done / prep.length) * 100}%` }} transition={{ duration: 0.7, ease }} style={{ background: "var(--t-sea)" }} />
       </div>
 
@@ -190,6 +192,8 @@ function DuringTrip({ onOpenMoney }: { onOpenMoney: () => void }) {
         <DayTimeline day={day} compact />
       </Rise>
 
+      <Fleuron />
+
       <Rise delay={0.2}>
         <MoneyGlance onOpen={onOpenMoney} />
       </Rise>
@@ -220,7 +224,7 @@ function CheckinNudge({ overdue, dueToday }: { overdue: string[]; dueToday: bool
   return (
     <Rise>
       <button type="button" onClick={() => openCheckin(day)} className="trip-pass-card flex w-full items-center gap-4 p-6 text-left">
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/70 text-[var(--t-sea)]">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[var(--t-sea)]">
           <MoonStars size={24} weight="duotone" />
         </span>
         <span className="min-w-0 flex-1">

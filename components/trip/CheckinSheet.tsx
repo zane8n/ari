@@ -99,7 +99,7 @@ function CheckinBody({ day }: { day: string }) {
         {STEPS.map((label, i) => (
           <li key={label}>
             <button type="button" onClick={() => setStep(i)} className="w-full text-left" aria-current={i === step ? "step" : undefined}>
-              <span className={`block h-1.5 rounded-full transition-colors duration-500 ${i <= step ? "bg-[var(--t-sea)]" : "bg-[var(--t-sunk)]"}`} />
+              <span className={`block h-px transition-colors duration-500 ${i <= step ? "bg-[var(--t-gilt)]" : "bg-[rgb(58_33_64/0.13)]"}`} />
               <span className={`mt-2 block text-xs ${i === step ? "font-medium text-[var(--t-ink)]" : "text-[var(--t-muted)]"}`}>{label}</span>
             </button>
           </li>
@@ -270,7 +270,7 @@ function CheckinBody({ day }: { day: string }) {
               <p className="trip-num mt-1 text-2xl">{fmt(money.leftUsd)}</p>
             </div>
           </div>
-          <p className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${money.headroomUsd >= 0 ? "bg-[var(--t-sea-soft)] text-[var(--t-sea-strong)]" : "bg-[var(--t-coral-soft)] text-[var(--t-coral)]"}`}>
+          <p className={` px-4 py-3 text-sm leading-relaxed ${money.headroomUsd >= 0 ? "bg-[var(--t-sea-soft)] text-[var(--t-sea-strong)]" : "bg-[var(--t-coral-soft)] text-[var(--t-coral)]"}`}>
             {money.headroomUsd >= 0
               ? `On track. The rest of the plan fits, with ${fmt(money.extrasPerDayUsd)} a day free for extras.`
               : `The plan now runs ${fmt(-money.headroomUsd)} over the pot. The Money tab has the cut list, in your agreed order.`}

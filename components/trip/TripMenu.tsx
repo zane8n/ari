@@ -144,7 +144,7 @@ function Passes() {
       {fresh ? (
         <m.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35 }} className="trip-pass-card flex flex-col gap-4 p-6">
           <p className="trip-eyebrow">A pass for {fresh.label}</p>
-          <p className="rounded-2xl bg-white/70 px-4 py-3 font-mono text-xs break-all select-all">{fresh.url}</p>
+          <p className=" bg-white/70 px-4 py-3 font-mono text-xs break-all select-all">{fresh.url}</p>
           <p className="text-[11px] text-[var(--t-muted)]">This link is shown once. Send it now.</p>
           <div className="flex gap-2">
             <button type="button" onClick={share} className="trip-btn trip-btn-primary flex-1">
