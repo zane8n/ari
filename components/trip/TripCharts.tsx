@@ -18,10 +18,10 @@ import {
 } from "recharts";
 import type { CategoryBreakdown, CumulativePoint, CurrencyMix, DaySpend, StatusBreakdown, VarianceItem } from "@/lib/trip/analysis";
 
-const INK = "#10262e";
-const MUTED = "#898781";
-const GRID = "#e1e0d9";
-const SURFACE = "#fffdf7";
+const INK = "#f2ece0";
+const MUTED = "#a69e8e";
+const GRID = "rgba(226, 205, 160, 0.12)";
+const SURFACE = "#15130f";
 
 /** Recharts' tooltip formatter types values loosely (string | number | undefined) — normalize once. */
 function toNum(value: unknown): number {
@@ -31,7 +31,7 @@ function toNum(value: unknown): number {
 function ChartCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
     <div className="trip-card px-4 py-4">
-      <h3 className="font-display text-lg leading-tight font-semibold">{title}</h3>
+      <h3 className="font-display text-lg leading-tight font-medium">{title}</h3>
       {subtitle && <p className="text-xs text-[var(--t-muted)]">{subtitle}</p>}
       <div className="mt-3">{children}</div>
     </div>
@@ -42,7 +42,7 @@ function tooltipStyle() {
   return {
     background: SURFACE,
     border: `1px solid ${GRID}`,
-    borderRadius: 4,
+    borderRadius: 0,
     fontSize: 12,
     color: INK,
   };
@@ -55,8 +55,8 @@ export function CumulativeSpendChart({ data, money }: { data: CumulativePoint[];
         <AreaChart data={data} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
           <defs>
             <linearGradient id="estimatedFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#898781" stopOpacity={0.16} />
-              <stop offset="100%" stopColor="#898781" stopOpacity={0} />
+              <stop offset="0%" stopColor="#a69e8e" stopOpacity={0.16} />
+              <stop offset="100%" stopColor="#a69e8e" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke={GRID} vertical={false} />
@@ -65,7 +65,7 @@ export function CumulativeSpendChart({ data, money }: { data: CumulativePoint[];
           <Tooltip contentStyle={tooltipStyle()} formatter={(value, name) => [money(toNum(value)), name]} />
           <Legend wrapperStyle={{ fontSize: 12 }} />
           <Area type="monotone" dataKey="cumulativeEstimatedUsd" name="Planned" stroke={MUTED} strokeWidth={2} fill="url(#estimatedFill)" dot={false} />
-          <Line type="monotone" dataKey="cumulativeActualUsd" name="Actual so far" stroke="#2a78d6" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
+          <Line type="monotone" dataKey="cumulativeActualUsd" name="Actual so far" stroke="#d6b876" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
         </AreaChart>
       </ResponsiveContainer>
     </ChartCard>
@@ -121,8 +121,8 @@ export function DaySpendBars({ data, money }: { data: DaySpend[]; money: (usd: n
           <YAxis tick={{ fontSize: 10, fill: MUTED }} axisLine={false} tickLine={false} width={44} tickFormatter={(v: number) => `$${v}`} />
           <Tooltip contentStyle={tooltipStyle()} formatter={(value) => money(toNum(value))} />
           <Legend wrapperStyle={{ fontSize: 12 }} />
-          <Bar dataKey="estimatedUsd" name="Planned" fill="#c3c2b7" radius={[3, 3, 0, 0]} />
-          <Bar dataKey="actualUsd" name="Logged" fill="#2a78d6" radius={[3, 3, 0, 0]} />
+          <Bar dataKey="estimatedUsd" name="Planned" fill="#4a453a" radius={[0, 0, 0, 0]} />
+          <Bar dataKey="actualUsd" name="Logged" fill="#d6b876" radius={[0, 0, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </ChartCard>
@@ -139,7 +139,7 @@ export function CurrencyMixBars({ data }: { data: CurrencyMix[] }) {
           <XAxis dataKey="currency" tick={{ fontSize: 12, fill: INK }} axisLine={{ stroke: GRID }} tickLine={false} />
           <YAxis tick={{ fontSize: 10, fill: MUTED }} axisLine={false} tickLine={false} width={44} tickFormatter={(v: number) => `$${v}`} />
           <Tooltip contentStyle={tooltipStyle()} formatter={(value) => `$${toNum(value).toFixed(2)}`} />
-          <Bar dataKey="usdEquivalent" fill="#1baf7a" radius={[3, 3, 0, 0]} />
+          <Bar dataKey="usdEquivalent" fill="#d6b876" radius={[0, 0, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </ChartCard>
@@ -151,13 +151,13 @@ export function VarianceList({ variances, money }: { variances: VarianceItem[]; 
   if (top.length === 0) return null;
   return (
     <div className="trip-card px-4 py-4">
-      <h3 className="font-display text-lg leading-tight font-semibold">Biggest surprises</h3>
+      <h3 className="font-display text-lg leading-tight font-medium">Biggest surprises</h3>
       <p className="text-xs text-[var(--t-muted)]">Items furthest from their planned estimate</p>
       <ul className="mt-3 flex flex-col gap-2">
         {top.map((item) => (
           <li key={item.id} className="flex items-center justify-between gap-3 text-sm">
             <span className="min-w-0 truncate">{item.label}</span>
-            <span className={`shrink-0 font-medium tabular-nums ${item.varianceUsd > 0 ? "text-red-600" : "text-green-700"}`}>
+            <span className={`shrink-0 font-medium tabular-nums ${item.varianceUsd > 0 ? "text-[var(--t-coral)]" : "text-[var(--t-good)]"}`}>
               {item.varianceUsd > 0 ? "+" : ""}
               {money(item.varianceUsd)}
             </span>

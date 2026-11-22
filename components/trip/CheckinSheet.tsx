@@ -121,7 +121,7 @@ function CheckinBody({ day }: { day: string }) {
                   disabled={busyId === event.id}
                   aria-pressed={event.status === "done"}
                   onClick={() => setStatus(event.id, "done")}
-                  className={`trip-btn !min-h-[40px] !px-3 ${event.status === "done" ? "bg-[var(--t-good)] text-white" : "trip-btn-ghost"}`}
+                  className={`trip-btn !min-h-[40px] !px-3 ${event.status === "done" ? "trip-btn-good" : "trip-btn-ghost"}`}
                 >
                   Done
                 </button>
@@ -130,7 +130,7 @@ function CheckinBody({ day }: { day: string }) {
                   disabled={busyId === event.id}
                   aria-pressed={event.status === "skipped"}
                   onClick={() => setStatus(event.id, "skipped")}
-                  className={`trip-btn !min-h-[40px] !px-3 ${event.status === "skipped" ? "bg-[var(--t-coral)] text-white" : "trip-btn-ghost"}`}
+                  className={`trip-btn !min-h-[40px] !px-3 ${event.status === "skipped" ? "trip-btn-warn" : "trip-btn-ghost"}`}
                 >
                   Skip
                 </button>

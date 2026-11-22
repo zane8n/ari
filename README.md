@@ -168,19 +168,26 @@ extras" figure. If the forecast exceeds the pot, the **cut list** (each line's
 `cut_rank`) applies in the agreed order. The **emergency reserve** is tracked
 apart and never absorbs overruns. Skipping an activity frees its unpaid cost.
 
-**Adding a trip** (real content is gitignored — this repo is public):
+**Adding a trip** — no terminal needed. Real trip content never goes in this
+public repo; it lives only in the database. Sign in as host, open
+`/host/trip/import` (or *Add a trip* in a trip's menu) and upload the trip's
+`.json` plan; it's validated and never overwrites an existing trip.
+(Developers can still run `pnpm seed:trip <slug>` against
+`content/trips/<slug>.local.{ts,json}`.)
 
-```bash
-cp content/trips/example.ts content/trips/<slug>.local.ts   # fill in the real plan
-pnpm db:migrate
-pnpm seed:trip <slug>
-```
+**Passes (guest access).** From a trip's menu (the monogram, top left) the
+host creates a named one-time pass and sends its link. Opening it shows a
+quiet welcome; tapping *Enter* burns the link and signs that one device into
+that one trip (signed cookie, ~400 days). Link previews can't burn it (claiming
+is a POST). A guest can do everything on the trip except manage passes, and
+can't see other trips or the host view. *Withdraw* signs the device out on its
+next request.
 
-Migration `0004` turns the old single-trip data into a legacy `arusha` trip
-(its pot/reserve fall back to `TRIP_CASH_BUDGET_USD` /
-`TRIP_RESERVE_BUDGET_USD`) and converts its logged actuals into expenses;
-`0005` then drops the old `actual_*` columns. **Run `pnpm db:migrate` before
-deploying this code**, or the tracker will query columns that don't exist yet.
+**Database migrations run automatically on every Vercel build**
+(`scripts/build-migrate.ts`, the first step of `pnpm build`) — transactional,
+so a failure rolls back and fails the build, leaving the previous deployment
+live. Locally, with no `DATABASE_URL`, the step is skipped. Note: Preview and
+Production currently share one Neon database, so a preview build migrates it too.
 
 ## Project structure
 

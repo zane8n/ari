@@ -1,4 +1,4 @@
-import { Cormorant_Garamond, Parisienne, Quicksand } from "next/font/google";
+import { Cormorant_Garamond, Jost, Parisienne, Quicksand } from "next/font/google";
 
 /** Romantic, mystical display serif — headlines, questions, the reveal. */
 export const display = Cormorant_Garamond({
@@ -23,4 +23,12 @@ export const body = Quicksand({
   variable: "--font-body",
   display: "swap",
   weight: ["400", "500", "600", "700"],
+});
+
+/** Trip tracker UI face — a crisp geometric sans for a quieter, more editorial register than the invitation's. */
+export const ui = Jost({
+  subsets: ["latin"],
+  variable: "--font-ui",
+  display: "swap",
+  weight: ["300", "400", "500", "600"],
 });

@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { HostLoginForm } from "@/components/host/HostLoginForm";
 import { HOST_SESSION_COOKIE_NAME, verifyHostSessionToken } from "@/lib/server/host-auth";
@@ -24,22 +25,27 @@ export default async function TripsPage({ searchParams }: { searchParams: Promis
   if (live.length === 1 && (await searchParams).all === undefined) redirect(`/host/trip/${live[0].trip.slug}`);
 
   return (
-    <main className="trip">
+    <main className="trip trip-luxe">
       <div className="mx-auto flex max-w-2xl flex-col gap-5 px-4 py-8">
         <a href="/host" className="text-xs font-semibold text-[var(--t-muted)] underline">
           ← Host view
         </a>
-        <h1 className="font-display text-4xl font-semibold">Trips</h1>
-        {withPhase.length === 0 && <p className="text-[var(--t-muted)]">No trips yet. Seed one with pnpm seed:trip &lt;slug&gt;.</p>}
+        <div className="flex items-end justify-between gap-3">
+          <h1 className="font-display text-4xl font-medium">Trips</h1>
+          <Link href="/host/trip/import" className="trip-btn trip-btn-ghost">
+            + Add a trip
+          </Link>
+        </div>
+        {withPhase.length === 0 && <p className="text-[var(--t-muted)]">No trips yet — add one from its plan file.</p>}
         <ul className="flex flex-col gap-3">
           {withPhase.map(({ trip, phase }) => (
             <li key={trip.id}>
               <a href={`/host/trip/${trip.slug}`} className="trip-card flex items-center justify-between gap-3 px-4 py-4">
                 <span>
-                  <span className="font-display block text-2xl leading-tight font-semibold">{trip.name}</span>
+                  <span className="font-display block text-2xl leading-tight font-medium">{trip.name}</span>
                   <span className="block text-sm text-[var(--t-muted)]">{formatDateRange(trip.startDate, trip.endDate)}</span>
                 </span>
-                <span className={`trip-tag ${phase === "after" ? "" : "!bg-[var(--t-sea)] !text-white"}`}>
+                <span className={`trip-tag ${phase === "after" ? "" : "!border-transparent !bg-[var(--t-sea)] !text-[var(--t-on-accent)]"}`}>
                   {phase === "before" ? "Upcoming" : phase === "during" ? "Now" : "Past"}
                 </span>
               </a>

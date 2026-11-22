@@ -29,7 +29,7 @@ export function CoachChat({ api }: { api: string }) {
   return (
     <div className="flex flex-col gap-3 trip-card px-4 py-4">
       <div>
-        <h3 className="font-display text-lg leading-tight font-semibold">Trip coach</h3>
+        <h3 className="font-display text-lg leading-tight font-medium">Trip coach</h3>
         <p className="text-xs text-[var(--t-muted)]">Ask it anything about the budget or itinerary — it sees the live data.</p>
       </div>
 
@@ -54,7 +54,7 @@ export function CoachChat({ api }: { api: string }) {
             <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
                 className={`max-w-[85%] whitespace-pre-wrap px-3 py-2 text-sm ${
-                  message.role === "user" ? "bg-[var(--t-ink)] text-[var(--t-surface)]" : "border border-[var(--t-line)] text-[var(--t-ink)]"
+                  message.role === "user" ? "border border-[rgb(214_184_118/0.4)] bg-[var(--t-sea-soft)] text-[var(--t-ink)]" : "border border-[var(--t-line)] text-[var(--t-ink)]"
                 }`}
               >
                 {message.parts.map((part, i) => (part.type === "text" ? <span key={i}>{part.text}</span> : null))}

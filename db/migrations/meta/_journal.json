@@ -43,6 +43,13 @@
       "when": 1795309178269,
       "tag": "0005_drop_legacy_actuals",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795343750611,
+      "tag": "0006_trip_passes",
+      "breakpoints": true
     }
   ]
 }

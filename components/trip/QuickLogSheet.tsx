@@ -114,14 +114,13 @@ function QuickLogBody({ logRequest }: { logRequest: LogRequest }) {
       >
         <div>
           <div className="flex items-stretch gap-2">
-            <div className="flex shrink-0 border border-[var(--t-line-strong)]">
+            <div className="trip-seg shrink-0" role="group" aria-label="Currency paid in">
               {[trip.spendCurrency, ...(trip.spendCurrency === "USD" ? [] : (["USD"] as Currency[]))].map((c) => (
                 <button
                   key={c}
                   type="button"
                   aria-pressed={currency === c}
                   onClick={() => setCurrency(c)}
-                  className={`min-w-14 px-2 text-sm font-bold ${currency === c ? "bg-[var(--t-ink)] text-[var(--t-surface)]" : "bg-[var(--t-surface)] text-[var(--t-muted)]"}`}
                 >
                   {c}
                 </button>
